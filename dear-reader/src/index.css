@@ -1,0 +1,92 @@
+@import "tailwindcss";
+@import url("https://fonts.googleapis.com/css2?family=Roboto&display=swap");
+
+@tailwind utilities;
+
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #25344f;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@theme {
+  --font-roboto: "Roboto", sans-serif;
+}
+
+.card {
+  background-color: #f6f6f6;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.content {
+  flex: 1;
+  padding: 20px;
+}
+
+.footer {
+  background: #617891;
+  color: #f6f6f6;
+  text-align: center;
+  padding: 10px;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+}
+
+.header {
+  color: #f6f6f6;
+  text-align: center;
+  padding: 10px;
+}
+
+h3 {
+  color: #25344f;
+}
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+main {
+  flex-grow: 1;
+  padding: 10px;
+  overflow-x: hidden;
+}
+
+@media (max-width: 768px) {
+  main {
+    padding: 15px;
+  }
+
+  footer {
+    padding: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  main {
+    padding: 8px;
+  }
+
+  footer {
+    padding: 8px;
+  }
+}

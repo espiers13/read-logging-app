@@ -1,0 +1,17 @@
+import { useNavigate } from "react-router";
+function BestSellers({ book }) {
+  const { book_image, author, description, title, primary_isbn10 } = book;
+  const navigate = useNavigate();
+
+  const handleClick = (e) => {
+    navigate(`/book/${primary_isbn10}`);
+  };
+
+  return (
+    <button className="object-cover w-20 p-1" onClick={handleClick}>
+      <img src={book_image} alt={title} aria-valuetext={primary_isbn10} />
+    </button>
+  );
+}
+
+export default BestSellers;

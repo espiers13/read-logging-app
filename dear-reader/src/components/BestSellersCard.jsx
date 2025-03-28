@@ -1,10 +1,13 @@
 import { useNavigate } from "react-router";
-function BestSellers({ book }) {
+function BestSellers({ book, setIsExiting }) {
   const { book_image, author, description, title, primary_isbn10 } = book;
   const navigate = useNavigate();
 
   const handleClick = (e) => {
-    navigate(`/book/${primary_isbn10}`);
+    setIsExiting(true);
+    setTimeout(() => {
+      navigate(`/book/${primary_isbn10}`);
+    }, 700);
   };
 
   return (

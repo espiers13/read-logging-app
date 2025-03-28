@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import url("https://fonts.googleapis.com/css2?family=Roboto&display=swap");
+@import "animate.css";
 
 @tailwind utilities;
 
@@ -89,4 +90,40 @@ main {
   footer {
     padding: 8px;
   }
+}
+
+.search-container {
+  position: relative;
+}
+
+.search-input {
+  height: 40px;
+  width: fill;
+  border-radius: 30px;
+  padding-left: 35px;
+  border: none;
+  background-color: #617891;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.search-icon {
+  position: absolute;
+  top: 50%;
+  left: 15px;
+  transform: translateY(-50%);
+  color: #f6f6f6;
+}
+
+.button {
+  background-color: #42517d;
+  color: #b3b3b3;
+}
+
+.active-button {
+  background-color: #b3b3b3;
+  color: #42517d;
+}
+
+.book-menu {
+  background-color: #617891;
 }

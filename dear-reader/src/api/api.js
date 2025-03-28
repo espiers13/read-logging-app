@@ -8,6 +8,10 @@ const googleBooksApi = axios.create({
   baseURL: "https://www.googleapis.com/books/v1",
 });
 
+const openLibraryApi = axios.create({
+  baseURL: "https://openlibrary.org",
+});
+
 const nytKey = "TeQkGTyrIZAealqg2ZdcNa7V9x01IZVj";
 
 const googleBooksKey = "AIzaSyAbtrbN1oivlDmrVumaSTLz268zlXc92qk";
@@ -34,6 +38,30 @@ export const getBestSellers = async (retries = 5, delay = 1000) => {
 
 export const getBookByIsbn = (book_isbn) => {
   const url = `/volumes?q=isbn:${book_isbn}&key=${googleBooksKey}`;
+  return googleBooksApi
+    .get(url)
+    .then(({ data }) => {
+      return data;
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+};
+
+export const searchBooks = (search_query, params) => {
+  const url = `/volumes?q=${params}${search_query}&printType=books&maxResults=40&orderBy=relevance&key=${googleBooksKey}`;
+  return googleBooksApi
+    .get(url)
+    .then(({ data }) => {
+      return data;
+    })
+    .catch((err) => {
+      throw err;
+    });
+};
+
+export const searchBooksByGenre = (genre) => {
+  const url = `/volumes?q=subject:${genre}&printType=books&maxResults=40&orderBy=newest&key=${googleBooksKey}`;
   return googleBooksApi
     .get(url)
     .then(({ data }) => {

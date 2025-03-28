@@ -6,6 +6,7 @@ import Loading from "../components/Loading";
 function Homepage() {
   const [isLoading, setIsLoading] = useState(false);
   const [trendingList, setTrendingList] = useState([]);
+  const [isExiting, setIsExiting] = useState(false);
 
   useEffect(() => {
     setIsLoading(true);
@@ -20,12 +21,46 @@ function Homepage() {
   }
 
   return (
-    <main className="">
-      <p className="font-roboto tracking-widest">Trending this week</p>
+    <main>
+      <p className="font-roboto tracking-widest mt-10">Trending this week</p>
       <div className="flex overflow-x-scroll hide-scroll-bar mt-5 shadow-2xl">
         <div className="flex flex-nowrap ">
           {trendingList.map((book) => {
-            return <BestSellers book={book} key={book.rank} />;
+            return (
+              <BestSellers
+                book={book}
+                key={book.rank}
+                setIsExiting={setIsExiting}
+              />
+            );
+          })}
+        </div>
+      </div>
+      <p className="font-roboto tracking-widest mt-10">New from friends</p>
+      <div className="flex overflow-x-scroll hide-scroll-bar mt-5 shadow-2xl">
+        <div className="flex flex-nowrap ">
+          {trendingList.map((book) => {
+            return (
+              <BestSellers
+                book={book}
+                key={book.rank}
+                setIsExiting={setIsExiting}
+              />
+            );
+          })}
+        </div>
+      </div>
+      <p className="font-roboto tracking-widest mt-10">On your bookshelf</p>
+      <div className="flex overflow-x-scroll hide-scroll-bar mt-5 shadow-2xl">
+        <div className="flex flex-nowrap ">
+          {trendingList.map((book) => {
+            return (
+              <BestSellers
+                book={book}
+                key={book.rank}
+                setIsExiting={setIsExiting}
+              />
+            );
           })}
         </div>
       </div>

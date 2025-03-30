@@ -1,25 +1,20 @@
-@import "tailwindcss";
 @import url("https://fonts.googleapis.com/css2?family=Roboto&display=swap");
-@import "animate.css";
+@import "tailwindcss/preflight"; /* for base styles */
+@tailwind utilities; /* includes utility classes */
 
-@tailwind utilities;
+@import "animate.css";
 
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
   background-color: #25344f;
-
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
-
-@theme {
   --font-roboto: "Roboto", sans-serif;
 }
 
@@ -76,7 +71,6 @@ main {
   main {
     padding: 15px;
   }
-
   footer {
     padding: 10px;
   }
@@ -86,7 +80,6 @@ main {
   main {
     padding: 8px;
   }
-
   footer {
     padding: 8px;
   }
@@ -126,4 +119,9 @@ main {
 
 .book-menu {
   background-color: #617891;
+}
+
+.quote {
+  background-color: #42517d;
+  color: #b3b3b3;
 }

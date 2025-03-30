@@ -8,8 +8,8 @@ const googleBooksApi = axios.create({
   baseURL: "https://www.googleapis.com/books/v1",
 });
 
-const openLibraryApi = axios.create({
-  baseURL: "https://openlibrary.org",
+const bookQuotesApi = axios.create({
+  baseURL: "https://book-quotes.onrender.com/api",
 });
 
 const nytKey = "TeQkGTyrIZAealqg2ZdcNa7V9x01IZVj";
@@ -63,6 +63,19 @@ export const searchBooks = (search_query, params) => {
 export const searchBooksByGenre = (genre) => {
   const url = `/volumes?q=subject:${genre}&printType=books&maxResults=40&orderBy=newest&key=${googleBooksKey}`;
   return googleBooksApi
+    .get(url)
+    .then(({ data }) => {
+      return data;
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+};
+
+export const getRandomQuote = () => {
+  const url = `/quote/random`;
+
+  return bookQuotesApi
     .get(url)
     .then(({ data }) => {
       return data;

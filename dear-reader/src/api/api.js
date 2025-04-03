@@ -12,6 +12,10 @@ const bookQuotesApi = axios.create({
   baseURL: "https://book-quotes.onrender.com/api",
 });
 
+const userApi = axios.create({
+  baseURL: "https://dear-reader-backend.onrender.com/api",
+});
+
 const nytKey = "TeQkGTyrIZAealqg2ZdcNa7V9x01IZVj";
 
 const googleBooksKey = "AIzaSyAbtrbN1oivlDmrVumaSTLz268zlXc92qk";
@@ -82,5 +86,38 @@ export const getRandomQuote = () => {
     })
     .catch((err) => {
       console.log(err);
+    });
+};
+
+export const createNewUser = (newUser) => {
+  return userApi
+    .post(`/signup`, newUser)
+    .then(({ data }) => {
+      return data;
+    })
+    .catch((err) => {
+      throw err;
+    });
+};
+
+export const loginUser = (user) => {
+  return userApi
+    .post(`/login`, user)
+    .then(({ data }) => {
+      return data;
+    })
+    .catch((err) => {
+      throw err;
+    });
+};
+
+export const getReadJournal = (username) => {
+  return userApi
+    .get(`/journal/${username}`)
+    .then(({ data }) => {
+      return data;
+    })
+    .catch((err) => {
+      throw err;
     });
 };

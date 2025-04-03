@@ -1,6 +1,6 @@
 import { useLocation, useNavigate } from "react-router-dom";
 
-function Header() {
+function Header({ currentUser, setCurrentUser }) {
   const { pathname } = useLocation();
   const navigate = useNavigate();
 
@@ -14,6 +14,12 @@ function Header() {
 
   const handleGoBack = () => {
     navigate(-1);
+  };
+
+  const handleLogout = () => {
+    setCurrentUser(null);
+    localStorage.removeItem("currentUser");
+    navigate("/login");
   };
 
   if (pathname === "/") {
@@ -32,23 +38,40 @@ function Header() {
     );
   }
 
-  if (pathname === "/friends") {
+  if (pathname.includes("/settings")) {
     return (
-      <header className="header">
-        <h1 className="font-serif text-5xl mt-3">Friends</h1>
-      </header>
-    );
-  }
-
-  if (pathname.includes("/profile")) {
-    return (
-      <header className="header">
-        <h1 className="font-serif text-5xl mt-3">Profile</h1>
-      </header>
+      <div className="flex items-center justify-between ml-2 mr-2 mt-2">
+        <button onClick={handleGoBack} className="flex-shrink-0">
+          <svg
+            className="h-8 w-8 mt-2 ml-2"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            strokeWidth="2"
+            stroke="currentColor"
+            fill="none"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path stroke="none" d="M0 0h24v24H0z" />{" "}
+            <polyline points="15 6 9 12 15 18" />
+          </svg>
+        </button>
+        <p className="text-center flex-1 text-lg font-serif font-bold mt-1">
+          Settings
+        </p>
+        <button className="button mr-2 p-1 rounded-lg" onClick={handleLogout}>
+          Log Out
+        </button>
+      </div>
     );
   }
 
   if (pathname === "/login") {
+    return <></>;
+  }
+
+  if (pathname === "/signup") {
     return <></>;
   }
 
@@ -103,6 +126,44 @@ function Header() {
         </p>
         <div className="w-15"></div>
       </div>
+    );
+  }
+
+  if (pathname.includes(currentUser.id)) {
+    return (
+      <header className="flex justify-between items-center space-x-4 ml-2 mr-2 header">
+        <button onClick={() => navigate(`/${currentUser.id}/settings`)}>
+          <svg
+            className="h-8 w-8 text-slate-50 mt-3"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <circle cx="12" cy="12" r="3" />
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+          </svg>
+        </button>
+        <h1 className="font-serif text-4xl mt-3">{currentUser.username}</h1>
+        <button onClick={() => navigate(`/${currentUser.id}/settings`)}>
+          <svg
+            className="h-8 w-8 text-slate-50"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            {" "}
+            <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />{" "}
+            <polyline points="16 6 12 2 8 6" />{" "}
+            <line x1="12" y1="2" x2="12" y2="15" />
+          </svg>
+        </button>
+      </header>
     );
   }
 

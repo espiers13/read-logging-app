@@ -1,8 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Roboto&display=swap");
-@import "tailwindcss/preflight"; /* for base styles */
-@tailwind utilities; /* includes utility classes */
-
+@import "tailwindcss/preflight";
 @import "animate.css";
+@tailwind utilities;
 
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
@@ -55,6 +54,10 @@ h3 {
   color: #25344f;
 }
 
+h4 {
+  color: #617891;
+}
+
 .app-container {
   display: flex;
   flex-direction: column;
@@ -91,7 +94,7 @@ main {
 
 .search-input {
   height: 40px;
-  width: fill;
+  width: 100%;
   border-radius: 30px;
   padding-left: 35px;
   border: none;
@@ -122,6 +125,21 @@ main {
 }
 
 .quote {
+  background-color: #42517d;
+  color: #b3b3b3;
+}
+
+.input {
+  background-color: #a1afbf;
+  color: #25344f;
+}
+
+.signupbutton {
+  background-color: #42517d;
+  color: #f6f6f6;
+}
+
+.bar {
   background-color: #42517d;
   color: #b3b3b3;
 }

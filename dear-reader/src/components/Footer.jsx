@@ -1,6 +1,6 @@
 import { useLocation, useNavigate } from "react-router-dom";
 
-function Footer() {
+function Footer({ currentUser }) {
   const { pathname } = useLocation();
   const navigate = useNavigate();
 
@@ -11,6 +11,11 @@ function Footer() {
   if (pathname === "/login") {
     return <></>;
   }
+
+  if (pathname === "/signup") {
+    return <></>;
+  }
+
   return (
     <footer className="footer">
       <div className="flex justify-between items-center space-x-4 ml-2 mr-2">
@@ -81,7 +86,7 @@ function Footer() {
             <path d="M9.5 15a3.5 3.5 0 0 0 5 0" />
           </svg>
         </button>
-        <button onClick={() => navigate("/profile")}>
+        <button onClick={() => navigate(`/${currentUser.id}/profile`)}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"

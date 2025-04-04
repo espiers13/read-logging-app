@@ -25,6 +25,7 @@ function Journal({ currentUser }) {
             review: book.review,
             published: items[0].volumeInfo.publishedDate,
             authors: items[0].volumeInfo.authors,
+            isbn: book.isbn,
           };
           return newBook;
         });
@@ -78,7 +79,7 @@ function Journal({ currentUser }) {
                       bookIndex === groupedBooks[month].length - 1;
                     return (
                       <li key={bookIndex}>
-                        <JournalCard book={book} />
+                        <JournalCard book={book} currentUser={currentUser} />
                         {!isLastBook && (
                           <hr className="bar border-0 clear-both w-full h-0.5 mt-2 mb-2" />
                         )}

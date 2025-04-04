@@ -3,15 +3,18 @@ import { useState, useEffect } from "react";
 import { getReadJournal, getBookByIsbn } from "../api/api";
 import RecentActivity from "../components/RecentActivity";
 import Loading from "../components/Loading";
+import Favourites from "../components/Favourites";
+import { getFavourites } from "../api/api";
 
 function Profile({ currentUser }) {
   const [favourites, setFavourites] = useState([]);
   const [recentActivity, setRecentActivity] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [recentActivityLoading, setRecentActivityLoading] = useState(false);
+  const [favouritesLoading, setFavouritesLoading] = useState(false);
 
   useEffect(() => {
     setRecentActivity([]);
-    setIsLoading(true);
+    setRecentActivityLoading(true);
     getReadJournal(currentUser.username).then((journalData) => {
       const recentBooks = journalData.slice(0, 3);
       const promises = recentBooks.map((book) => {
@@ -21,13 +24,35 @@ function Profile({ currentUser }) {
             title: book.title,
             rating: book.rating,
             date_read: book.date_read,
+            isbn: book.isbn,
           };
           return newBook;
         });
       });
       Promise.all(promises).then((newBooks) => {
         setRecentActivity((prevActivity) => [...prevActivity, ...newBooks]);
-        setIsLoading(false);
+        setRecentActivityLoading(false);
+      });
+    });
+  }, [currentUser.id]);
+
+  useEffect(() => {
+    setFavourites([]);
+    setFavouritesLoading(true);
+    getFavourites(currentUser.id).then((favouritesData) => {
+      const promises = favouritesData.map((favourite) => {
+        return getBookByIsbn(favourite.isbn).then(({ items }) => {
+          const newBook = {
+            thumbnail: items[0].volumeInfo.imageLinks.thumbnail,
+            title: items[0].volumeInfo.title,
+            isbn: favourite.isbn,
+          };
+          return newBook;
+        });
+      });
+      Promise.all(promises).then((newBooks) => {
+        setFavourites((prevFavourites) => [...prevFavourites, ...newBooks]);
+        setFavouritesLoading(false);
       });
     });
   }, [currentUser.id]);
@@ -45,14 +70,24 @@ function Profile({ currentUser }) {
 
         <h1 className="text-left w-full pl-4">FAVOURITES</h1>
 
+        {favouritesLoading ? (
+          <Loading />
+        ) : (
+          <div className="grid grid-cols-3 gap-0 w-full">
+            {favourites.map((favourite, index) => {
+              return <Favourites favourite={favourite} key={index} />;
+            })}
+          </div>
+        )}
+
         <hr className="bar border-0 clear-both w-full h-0.5 mt-2 mb-2" />
 
         <h1 className="text-left w-full pl-4">RECENT ACTIVITY</h1>
 
-        {isLoading ? (
+        {recentActivityLoading ? (
           <Loading />
         ) : (
-          <div className="flex flex-cols-3 justify-start w-full">
+          <div className="grid grid-cols-3 gap-0 w-full">
             {recentActivity.map((book, index) => {
               return <RecentActivity book={book} key={index} />;
             })}

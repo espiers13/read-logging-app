@@ -30,11 +30,15 @@ function Homepage() {
     return <Loading />;
   }
 
+  console.log(bookQuote);
+
   return (
     <main>
-      <div className="mb-8">
-        <RandomQuote bookQuote={bookQuote} />
-      </div>
+      {Object.keys(bookQuote).length === 0 ? null : (
+        <div className="mb-8">
+          <RandomQuote bookQuote={bookQuote} />
+        </div>
+      )}
       <p className="font-roboto tracking-widest mt-8">Trending this week</p>
 
       <div className="flex overflow-x-scroll hide-scroll-bar mt-5 shadow-2xl">

@@ -1,11 +1,29 @@
 import Rating from "@mui/material/Rating";
+import { useNavigate } from "react-router-dom";
+import { deleteFromReadJournal } from "../api/api";
+import { useState } from "react";
+import DeletePopup from "./DeletePopup";
 
-function JournalCard({ book }) {
-  const { date_read, title, thumbnail, review, rating, authors, published } =
-    book;
+function JournalCard({ book, currentUser }) {
+  const { id } = currentUser;
+
+  const navigate = useNavigate();
+  const {
+    date_read,
+    title,
+    thumbnail,
+    review,
+    rating,
+    authors,
+    published,
+    isbn,
+  } = book;
+  const [popup, setPopup] = useState(false);
 
   const handleDelete = (e) => {
-    console.log(`delete ${title}`);
+    deleteFromReadJournal(id, isbn).then(() => {
+      window.location.reload();
+    });
   };
 
   const date = new Date(date_read);
@@ -18,9 +36,14 @@ function JournalCard({ book }) {
     <main className="mt-2.5 mb-2.5">
       <div className="flex items-center space-x-4">
         <h4 className="text-4xl">{dateRead}</h4>
-        <div className="shrink-0">
+        <button
+          onClick={() => {
+            navigate(`/book/${isbn}`);
+          }}
+          className="shrink-0"
+        >
           <img src={thumbnail} alt={title} className="w-24" />
-        </div>
+        </button>
         <div className="flex-1 min-w-0">
           <p className="mb-0.5">{title}</p>
           {authors.length > 1 ? (
@@ -44,7 +67,9 @@ function JournalCard({ book }) {
         </div>
         <button
           className="button text-sm p-1 rounded-lg"
-          onClick={handleDelete}
+          onClick={() => {
+            setPopup(true);
+          }}
         >
           <svg
             className="h-4 w-4 text-slate-50"
@@ -62,6 +87,11 @@ function JournalCard({ book }) {
           </svg>
         </button>
       </div>
+      {popup ? (
+        <DeletePopup setPopup={setPopup} handleDelete={handleDelete} />
+      ) : (
+        <></>
+      )}
     </main>
   );
 }

@@ -121,3 +121,50 @@ export const getReadJournal = (username) => {
       throw err;
     });
 };
+
+export const deleteFromReadJournal = (id, isbn) => {
+  return userApi.delete(`/journal/${id}?isbn=${isbn}`).catch((err) => {
+    throw err;
+  });
+};
+
+export const getFavourites = (user_id) => {
+  return userApi
+    .get(`/${user_id}/favourites`)
+    .then(({ data }) => {
+      return data;
+    })
+    .catch((err) => {
+      throw err;
+    });
+};
+
+export const getBookshelf = (username) => {
+  return userApi
+    .get(`/bookshelf/${username}`)
+    .then(({ data }) => {
+      return data;
+    })
+    .catch((err) => {
+      throw err;
+    });
+};
+
+export const deleteFromBookshelf = (id, isbn) => {
+  return userApi.delete(`/bookshelf/${id}?isbn=${isbn}`).catch((err) => {
+    throw err;
+  });
+};
+
+export const markBookAsRead = (isbn, rating, review, user_id) => {
+  const input = { isbn: isbn, rating: rating, review: review };
+
+  return userApi
+    .patch(`/bookshelf/${user_id}`, input)
+    .then(({ data }) => {
+      return data;
+    })
+    .catch((err) => {
+      throw err;
+    });
+};

@@ -10,7 +10,6 @@ import BookInfo from "./pages/BookInfo";
 import Search from "./pages/Search";
 import Profile from "./pages/Profile";
 import Friends from "./pages/Friends";
-import Readlist from "./pages/Readlist";
 import SearchResults from "./pages/SearchResults";
 import PageNotFound from "./pages/PageNotFound";
 import SearchByGenre from "./pages/SearchByGenre";
@@ -92,10 +91,6 @@ function App() {
           <Route
             path="/:user_id/profile"
             element={<Profile currentUser={currentUser} />}
-          />
-          <Route
-            path="/:user_id/readlist"
-            element={<Readlist currentUser={currentUser} />}
           />
           <Route path="/search/:search_query" element={<SearchResults />} />
           <Route path="/search/genre/:genre" element={<SearchByGenre />} />

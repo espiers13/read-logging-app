@@ -16,6 +16,7 @@ import SearchByGenre from "./pages/SearchByGenre";
 import Settings from "./pages/Settings";
 import Bookshelf from "./pages/Bookshelf";
 import Journal from "./pages/Journal";
+import FriendProfile from "./pages/FriendProfile";
 
 function App() {
   const [currentUser, setCurrentUser] = useState(() => {
@@ -34,7 +35,7 @@ function App() {
   return (
     <div className="app-container">
       <Header currentUser={currentUser} setCurrentUser={setCurrentUser} />
-      <main className="grow">
+      <main className="flex-grow">
         <Routes>
           {/* Conditional route for homepage */}
           <Route
@@ -102,6 +103,10 @@ function App() {
                 setCurrentUser={setCurrentUser}
               />
             }
+          />
+          <Route
+            path="/user/:friend_username/:friend_id"
+            element={<FriendProfile currentUser={currentUser} />}
           />
 
           {/* Page Not Found Route */}

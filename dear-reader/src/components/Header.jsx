@@ -5,6 +5,7 @@ function Header({ currentUser, setCurrentUser }) {
   const navigate = useNavigate();
 
   const genre = pathname.split("/search/genre/")[1];
+  const friendUsername = pathname.split("/")[2];
 
   const decodedGenre = decodeURIComponent(genre);
 
@@ -26,6 +27,31 @@ function Header({ currentUser, setCurrentUser }) {
     return (
       <header className="header">
         <h1 className="font-serif text-5xl mt-3">Dear Reader</h1>
+      </header>
+    );
+  }
+
+  if (pathname.includes(`/user/`)) {
+    return (
+      <header className="flex justify-between items-center space-x-4 ml-2 mr-2 header">
+        <button onClick={handleGoBack}>
+          <svg
+            className="h-8 w-8 mt-2"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            strokeWidth="2"
+            stroke="currentColor"
+            fill="none"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path stroke="none" d="M0 0h24v24H0z" />{" "}
+            <polyline points="15 6 9 12 15 18" />
+          </svg>
+        </button>
+        <h1 className="font-serif text-4xl mt-3">{friendUsername}</h1>
+        <div className="w-7"></div>
       </header>
     );
   }

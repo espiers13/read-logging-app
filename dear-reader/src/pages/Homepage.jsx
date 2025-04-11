@@ -1,14 +1,19 @@
 import { useState, useEffect } from "react";
-import { getBestSellers, getRandomQuote } from "../api/api";
+import {
+  getBestSellers,
+  getRandomQuote,
+  getBookshelf,
+  getBookByIsbn,
+} from "../api/api";
 import BestSellers from "../components/BestSellersCard";
 import Loading from "../components/Loading";
 import RandomQuote from "../components/RandomQuote";
 
-function Homepage() {
+function Homepage({ currentUser }) {
   const [isLoading, setIsLoading] = useState(false);
   const [trendingList, setTrendingList] = useState([]);
-  const [isExiting, setIsExiting] = useState(false);
   const [bookQuote, setBookQuote] = useState({});
+  const [bookshelf, setBookshelf] = useState([]);
 
   useEffect(() => {
     setIsLoading(true);
@@ -26,15 +31,38 @@ function Homepage() {
     });
   }, []);
 
+  useEffect(() => {
+    setBookshelf([]);
+    setIsLoading(true);
+    getBookshelf(currentUser.username).then((bookshelfData) => {
+      const promises = bookshelfData.map((book) => {
+        return getBookByIsbn(book.isbn).then(({ items }) => {
+          const newBook = {
+            book_image: items[0].volumeInfo.imageLinks.thumbnail,
+            title: book.title,
+            primary_isbn10: book.isbn,
+          };
+          return newBook;
+        });
+      });
+      Promise.all(promises).then((newBooks) => {
+        setBookshelf((prevBookshelf) => [...prevBookshelf, ...newBooks]);
+        setIsLoading(false);
+      });
+    });
+  }, [currentUser.id]);
+
   if (isLoading) {
     return <Loading />;
   }
 
-  console.log(bookQuote);
+  console.log(bookshelf);
 
   return (
     <main>
-      {Object.keys(bookQuote).length === 0 ? null : (
+      {!bookQuote ? (
+        <></>
+      ) : (
         <div className="mb-8">
           <RandomQuote bookQuote={bookQuote} />
         </div>
@@ -44,13 +72,7 @@ function Homepage() {
       <div className="flex overflow-x-scroll hide-scroll-bar mt-5 shadow-2xl">
         <div className="flex flex-nowrap ">
           {trendingList.map((book) => {
-            return (
-              <BestSellers
-                book={book}
-                key={book.rank}
-                setIsExiting={setIsExiting}
-              />
-            );
+            return <BestSellers book={book} key={book.rank} />;
           })}
         </div>
       </div>
@@ -58,26 +80,18 @@ function Homepage() {
       <div className="flex overflow-x-scroll hide-scroll-bar mt-5 shadow-2xl">
         <div className="flex flex-nowrap ">
           {trendingList.map((book) => {
-            return (
-              <BestSellers
-                book={book}
-                key={book.rank}
-                setIsExiting={setIsExiting}
-              />
-            );
+            return <BestSellers book={book} key={book.rank} />;
           })}
         </div>
       </div>
       <p className="font-roboto tracking-widest mt-8">On your bookshelf</p>
       <div className="flex overflow-x-scroll hide-scroll-bar mt-5 shadow-2xl">
         <div className="flex flex-nowrap ">
-          {trendingList.map((book) => {
+          {bookshelf.map((book) => {
             return (
-              <BestSellers
-                book={book}
-                key={book.rank}
-                setIsExiting={setIsExiting}
-              />
+              <div>
+                <BestSellers book={book} key={book.isbn} />
+              </div>
             );
           })}
         </div>

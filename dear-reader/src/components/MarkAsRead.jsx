@@ -25,18 +25,7 @@ function MarkAsRead({ book, setReadPopup, handleMarkAsRead }) {
                     <line x1="6" y1="6" x2="18" y2="18" />
                   </svg>
                 </button>
-                <div className="h-60 w-80 flex justify-center items-center mt-2">
-                  {" "}
-                  <h2
-                    className="font-serif font-bold text-gray-900 mt-5"
-                    id="modal-title"
-                  >
-                    {book.title}
-                  </h2>
-                  <p className="text-sm text-gray-500 mt-1 italic">
-                    by {authors}
-                  </p>
-                </div>
+
               </div>
             </div>
           </div>

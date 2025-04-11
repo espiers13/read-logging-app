@@ -168,3 +168,72 @@ export const markBookAsRead = (isbn, rating, review, user_id) => {
       throw err;
     });
 };
+
+export const getFriendsByUserId = (user_id) => {
+  return userApi
+    .get(`/friends/${user_id}`)
+    .then(({ data }) => {
+      return data;
+    })
+    .catch((err) => {
+      throw err;
+    });
+};
+
+export const getUserById = (user_id) => {
+  return userApi
+    .get(`/user/${user_id}`)
+    .then(({ data }) => {
+      return data;
+    })
+    .catch((err) => {
+      throw err;
+    });
+};
+
+export const getIdByUsername = (username) => {
+  return userApi
+    .get(`/user/${username}`)
+    .then(({ data }) => {
+      return data;
+    })
+    .catch((err) => {
+      throw err;
+    });
+};
+
+export const getFriendRequestsByUserId = (user_id) => {
+  return userApi
+    .get(`/friends/pending/${user_id}`)
+    .then(({ data }) => {
+      return data;
+    })
+    .catch((err) => {
+      throw err;
+    });
+};
+
+export const sendFriendRequest = (friend_id, user_id) => {
+  const input = { user_id: user_id };
+
+  return userApi
+    .post(`/friends/request/${friend_id}`, input)
+    .then(({ data }) => {
+      return data.msg;
+    })
+    .catch((err) => {
+      throw err;
+    });
+};
+
+export const acceptFriendRequest = (friend_id, user_id) => {
+  const input = { user_id };
+  return userApi
+    .patch(`/friends/accept/${friend_id}`, input)
+    .then(({ data }) => {
+      return data.msg;
+    })
+    .catch((err) => {
+      throw err;
+    });
+};

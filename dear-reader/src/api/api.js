@@ -156,11 +156,24 @@ export const deleteFromBookshelf = (id, isbn) => {
   });
 };
 
+export const addToBookshelf = (user_id, isbn, title) => {
+  const input = { user_id: user_id, newBook: { isbn: isbn, title: title } };
+
+  return userApi
+    .post(`/bookshelf`, input)
+    .then(({ data }) => {
+      return data;
+    })
+    .catch((err) => {
+      throw err;
+    });
+};
+
 export const markBookAsRead = (isbn, rating, review, user_id) => {
   const input = { isbn: isbn, rating: rating, review: review };
 
   return userApi
-    .patch(`/bookshelf/${user_id}`, input)
+    .patch(`/bookshelf/${user_id}/move`, input)
     .then(({ data }) => {
       return data;
     })

@@ -1,15 +1,42 @@
 import React, { useState } from "react";
+import { Rating } from "@mui/material";
+import { addToBookshelf, deleteFromBookshelf } from "../api/api";
 
-function BookMenu({ currentBook, setPopup }) {
+function BookMenu({
+  isOnBookshelf,
+  setIsRead,
+  setIsOnBookshelf,
+  isRead,
+  setPopup,
+  currentUser,
+  setRating,
+  rating,
+  title,
+  isbn,
+}) {
+  const { username, id } = currentUser;
   const [isExiting, setIsExiting] = useState(false);
   const [backdropExiting, setBackdropExiting] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleRead = (e) => {
     console.log("read");
   };
 
   const handleBookshelf = (e) => {
-    console.log("bookshelf");
+    setIsLoading(true);
+    if (isOnBookshelf) {
+      deleteFromBookshelf(id, isbn).then((data) => {
+        setIsOnBookshelf(false);
+        setIsLoading(false);
+      });
+    }
+    if (!isOnBookshelf) {
+      addToBookshelf(id, isbn, title).then((data) => {
+        setIsOnBookshelf(true);
+        setIsLoading(false);
+      });
+    }
   };
 
   const handleShare = (e) => {
@@ -18,6 +45,11 @@ function BookMenu({ currentBook, setPopup }) {
 
   const handleReview = (e) => {
     console.log("review");
+  };
+
+  const handleRating = (e) => {
+    setRating(e.target.value);
+    console.log(e.target.value);
   };
 
   const handleClose = () => {
@@ -49,43 +81,66 @@ function BookMenu({ currentBook, setPopup }) {
                 className="flex flex-col items-center"
                 onClick={handleRead}
               >
-                <svg
-                  className="h-12 w-12 text-slate-200"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
+                {isRead ? (
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    className="h-12 w-12 text-slate-200"
+                  >
+                    <path d="M11.25 4.533A9.707 9.707 0 0 0 6 3a9.735 9.735 0 0 0-3.25.555.75.75 0 0 0-.5.707v14.25a.75.75 0 0 0 1 .707A8.237 8.237 0 0 1 6 18.75c1.995 0 3.823.707 5.25 1.886V4.533ZM12.75 20.636A8.214 8.214 0 0 1 18 18.75c.966 0 1.89.166 2.75.47a.75.75 0 0 0 1-.708V4.262a.75.75 0 0 0-.5-.707A9.735 9.735 0 0 0 18 3a9.707 9.707 0 0 0-5.25 1.533v16.103Z" />
+                  </svg>
+                ) : (
+                  <svg
+                    fill="none"
+                    viewBox="0 0 24 24"
                     strokeWidth="2"
-                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-                  />
-                </svg>
+                    stroke="currentColor"
+                    className="h-12 w-12 text-slate-200"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25"
+                    />
+                  </svg>
+                )}
                 Read
               </button>
               <button
                 className="flex flex-col items-center"
                 onClick={handleBookshelf}
+                disabled={isLoading}
               >
-                <svg
-                  className="h-12 w-12 text-slate-200"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  strokeWidth="2"
-                  stroke="currentColor"
-                  fill="none"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  {" "}
-                  <path stroke="none" d="M0 0h24v24H0z" />{" "}
-                  <circle cx="12" cy="12" r="9" />{" "}
-                  <polyline points="12 7 12 12 15 15" />
-                </svg>
+                {isOnBookshelf ? (
+                  <svg
+                    className="h-12 w-12 text-slate-200"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 6a.75.75 0 0 0-1.5 0v6c0 .414.336.75.75.75h4.5a.75.75 0 0 0 0-1.5h-3.75V6Z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                ) : (
+                  <svg
+                    className="h-12 w-12 text-slate-200"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth="2"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                    />
+                  </svg>
+                )}
                 Bookshelf
               </button>
+
               <button
                 className="flex flex-col items-center"
                 onClick={handleShare}
@@ -109,9 +164,22 @@ function BookMenu({ currentBook, setPopup }) {
             </div>
 
             <div className="flex flex-col items-center">
-              <hr className="bg-gray-400 border-0 clear-both w-9/10 h-0.5 mt-2 mb-2" />
+              <hr className="bg-gray-100 border-0 clear-both w-9/10 h-0.5 mt-2 mb-2" />
               <button onClick={handleReview}>Write a Review</button>
-              <hr className="bg-gray-400 border-0 clear-both w-9/10 h-0.5 mt-2 mb-2" />
+              <hr className="bg-gray-100 border-0 clear-both w-9/10 h-0.5 mt-2 mb-2" />
+              {isRead ? (
+                <div className="flex flex-col items-center">
+                  <h2 className="mb-1">Your Rating</h2>
+                  <Rating precision={0.5} value={rating} readOnly />
+                </div>
+              ) : (
+                <div className="flex flex-col items-center">
+                  <h2 className="mb-1">Rate</h2>
+                  <Rating precision={0.5} onChange={handleRating} />
+                </div>
+              )}
+
+              <hr className="bg-gray-100 border-0 clear-both w-9/10 h-0.5 mt-2 mb-2" />
               <button className="mb-2" onClick={handleClose}>
                 Close
               </button>

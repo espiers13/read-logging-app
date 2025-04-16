@@ -5,16 +5,19 @@ import Loading from "../components/Loading";
 import { useNavigate } from "react-router-dom";
 import BookMenu from "../components/BookMenu";
 import Rating from "@mui/material/Rating";
+import { getReadJournal, getBookshelf } from "../api/api";
 
-function BookInfo() {
+function BookInfo({ currentUser }) {
   const [isLoading, setIsLoading] = useState(false);
   const [currentBook, setCurrentBook] = useState(null);
   const [popup, setPopup] = useState(false);
-  const [isReadMore, setIsReadMore] = useState(false);
+  const [isRead, setIsRead] = useState(false);
+  const [isOnBookshelf, setIsOnBookshelf] = useState(false);
+  const [rating, setRating] = useState(0);
   const navigate = useNavigate();
   let image =
     "https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg?20200913095930";
-
+  const { username } = currentUser;
   const { book_id } = useParams();
   const handleGoBack = () => {
     navigate(-1);
@@ -24,6 +27,24 @@ function BookInfo() {
     setIsLoading(true);
     getBookByIsbn(book_id).then(({ items }) => {
       setCurrentBook(items[0].volumeInfo), setIsLoading(false);
+    });
+  }, [book_id]);
+
+  useEffect(() => {
+    setIsLoading(true);
+    getReadJournal(username).then((books) => {
+      setIsRead(books.some((book) => book.isbn === book_id));
+      const list = books.find((book) => book.isbn === book_id);
+      setRating(list ? list.rating : null);
+      setIsLoading(false);
+    });
+  }, [book_id]);
+
+  useEffect(() => {
+    setIsLoading(true);
+    getBookshelf(username).then((books) => {
+      setIsOnBookshelf(books.some((book) => book.isbn === book_id));
+      setIsLoading(false);
     });
   }, [book_id]);
 
@@ -40,7 +61,18 @@ function BookInfo() {
   return (
     <main className="">
       {popup ? (
-        <BookMenu currentBook={currentBook} setPopup={setPopup} />
+        <BookMenu
+          isOnBookshelf={isOnBookshelf}
+          setPopup={setPopup}
+          isRead={isRead}
+          currentUser={currentUser}
+          rating={rating}
+          setRating={setRating}
+          title={currentBook.title}
+          isbn={book_id}
+          setIsRead={setIsRead}
+          setIsOnBookshelf={setIsOnBookshelf}
+        />
       ) : (
         <></>
       )}
@@ -93,10 +125,16 @@ function BookInfo() {
           />
         </div>
         <div className="p-6 text-center">
-          <h4 className="text-base text-slate-600 mt-4 font-roboto justify-center mb-2">
-            Your rating:
-          </h4>
-          <Rating name="half-rating" defaultValue={2.5} precision={0.5} />
+          {rating ? (
+            <div>
+              <h4 className="text-base text-slate-600 mt-4 font-roboto justify-center mb-2">
+                Your rating:
+              </h4>{" "}
+              <Rating defaultValue={rating} precision={0.5} />
+            </div>
+          ) : (
+            <></>
+          )}
           <p className="mb-1 text-xl font-semibold text-slate-800 font-serif">
             {currentBook.title}
           </p>
@@ -121,20 +159,15 @@ function BookInfo() {
             );
           })}
 
-          <p
-            className={`text-sm mt-3 font-roboto overflow-hidden ${
-              !isReadMore ? "line-clamp-4" : ""
-            }`}
-          >
-            {currentBook.description}
-          </p>
-
-          <button
-            onClick={() => setIsReadMore(!isReadMore)}
-            className="text-white mt-2 text-sm underline"
-          >
-            {isReadMore ? "Read Less" : "Read More"}
-          </button>
+          {
+            <p
+              className={
+                "text-sm mt-3 font-roboto overflow-hidden line-clamp-4"
+              }
+            >
+              {currentBook.description}
+            </p>
+          }
 
           <h4 className="text-base text-slate-600 mt-4 font-roboto ">
             Friends who have read this book:

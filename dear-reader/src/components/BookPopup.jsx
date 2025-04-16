@@ -1,32 +1,77 @@
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
-import { deleteFromBookshelf } from "../api/api";
-import MarkAsRead from "./MarkAsRead";
+import { useState, useEffect } from "react";
+import { Rating } from "@mui/material";
+import {
+  getReadJournal,
+  getBookshelf,
+  deleteFromBookshelf,
+  markBookAsRead,
+} from "../api/api";
 
 function BookPopup({ setPopup, book, currentUser }) {
   const navigate = useNavigate();
   const { thumbnail, title, isbn, authors, description } = book;
   const [readPopup, setReadPopup] = useState(false);
+  const [rating, setRating] = useState(0);
+  const [review, setReview] = useState("");
+  const [isRead, setIsRead] = useState(false);
+  const [isOnBookshelf, setIsOnBookshelf] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const { id } = currentUser;
+  const { id, username } = currentUser;
 
   let image =
     "https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg?20200913095930";
 
   image = thumbnail || image;
 
+  useEffect(() => {
+    setIsLoading(true);
+    getReadJournal(username).then((books) => {
+      setIsRead(books.some((book) => book.isbn === isbn));
+    });
+  }, [isbn]);
+
+  useEffect(() => {
+    setIsLoading(true);
+    getBookshelf(username).then((books) => {
+      setIsOnBookshelf(books.some((book) => book.isbn === isbn));
+    });
+  }, [isbn]);
+
   const decodedText =
     new DOMParser().parseFromString(description, "text/html").body
       .textContent || "";
 
   const handleMarkAsRead = (e) => {
-    console.log("mark as read");
+    setReadPopup(true);
+    setIsRead(true);
+    markBookAsRead(isbn, e.target.value, review, id);
+  };
+
+  const handleRating = (e) => {
+    setRating(e.target.value);
+    setIsRead(true);
+    markBookAsRead(isbn, e.target.value, review, id);
   };
 
   const handleDelete = (e) => {
     deleteFromBookshelf(id, isbn).then(() => {
       window.location.reload();
     });
+  };
+
+  const handleSetReview = (e) => {
+    setReview(e.target.value);
+  };
+
+  const handleReview = (e) => {
+    e.preventDefault();
+    markBookAsRead(isbn, rating, review, id);
+  };
+
+  const handleRemoveFromJournal = (e) => {
+    console.log("remove from journal");
   };
 
   return (
@@ -85,27 +130,56 @@ function BookPopup({ setPopup, book, currentUser }) {
               >
                 Delete
               </button>
-              <button
-                className="text-blue-600 text-sm p-1 rounded-lg"
-                onClick={() => {
-                  setReadPopup(true);
-                }}
-              >
-                Mark as read
-              </button>
+              {isRead ? (
+                <button
+                  className="text-blue-600 text-sm p-1 rounded-lg"
+                  onClick={handleRemoveFromJournal}
+                >
+                  Remove from Read
+                </button>
+              ) : (
+                <button
+                  className="text-blue-600 text-sm p-1 rounded-lg"
+                  onClick={handleMarkAsRead}
+                >
+                  Mark as read
+                </button>
+              )}
             </div>
+            <Rating
+              name="half-rating"
+              precision={0.5}
+              onChange={handleRating}
+              readOnly={rating}
+            />
+            {readPopup ? (
+              <form class="mb-6" onSubmit={handleReview}>
+                <div class="py-2 px-4 mb-4 bg-white rounded-lg rounded-t-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+                  <label for="comment" class="sr-only">
+                    Your comment
+                  </label>
+                  <textarea
+                    id="comment"
+                    rows="3"
+                    class="px-0 w-full text-sm text-gray-900 border-0"
+                    placeholder="Write a review..."
+                    required
+                    onChange={handleSetReview}
+                  ></textarea>
+                </div>
+                <button
+                  type="submit"
+                  class="inline-flex items-center py-2.5 px-4 text-xs font-medium text-center text-white button rounded-lg"
+                >
+                  Post review
+                </button>
+              </form>
+            ) : (
+              <></>
+            )}
           </div>
         </div>
       </div>
-      {readPopup ? (
-        <MarkAsRead
-          book={book}
-          setReadPopup={setReadPopup}
-          handleMarkAsRead={handleMarkAsRead}
-        />
-      ) : (
-        <></>
-      )}
     </div>
   );
 }

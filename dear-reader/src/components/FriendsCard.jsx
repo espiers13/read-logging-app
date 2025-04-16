@@ -1,7 +1,14 @@
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 function FriendsCard({ friend }) {
   const navigate = useNavigate();
+  const [popup, setPopup] = useState(false);
+
+  const manageRemoveFriend = (e) => {
+    setPopup(!popup);
+    console.log(popup);
+  };
 
   return (
     <div className="flex items-center space-x-4 mt-2 ml-3">
@@ -20,9 +27,9 @@ function FriendsCard({ friend }) {
       </div>
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium truncate">{friend.username}</p>
-        <p className="text-sm text-gray-500 truncate dark:text-gray-400">
+        <button onClick={manageRemoveFriend} className="text-sm text-gray-500">
           remove friend
-        </p>
+        </button>
       </div>
     </div>
   );

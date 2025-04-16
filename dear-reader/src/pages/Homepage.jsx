@@ -56,8 +56,6 @@ function Homepage({ currentUser }) {
     return <Loading />;
   }
 
-  console.log(bookshelf);
-
   return (
     <main>
       {!bookQuote ? (
@@ -89,8 +87,8 @@ function Homepage({ currentUser }) {
         <div className="flex flex-nowrap ">
           {bookshelf.map((book) => {
             return (
-              <div>
-                <BestSellers book={book} key={book.isbn} />
+              <div key={book.isbn}>
+                <BestSellers book={book} />
               </div>
             );
           })}

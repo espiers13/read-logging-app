@@ -22,6 +22,7 @@ function BookInfo({ currentUser }) {
   const handleGoBack = () => {
     navigate(-1);
   };
+  const [myReview, setMyReview] = useState("");
 
   useEffect(() => {
     setIsLoading(true);
@@ -37,6 +38,7 @@ function BookInfo({ currentUser }) {
       const list = books.find((book) => book.isbn === book_id);
       setRating(list ? list.rating : null);
       setIsLoading(false);
+      setMyReview(list ? list.review : null);
     });
   }, [book_id]);
 
@@ -126,11 +128,11 @@ function BookInfo({ currentUser }) {
         </div>
         <div className="p-6 text-center">
           {rating ? (
-            <div>
-              <h4 className="text-base text-slate-600 mt-4 font-roboto justify-center mb-2">
+            <div className="mb-2">
+              <h4 className="text-base text-slate-600 font-roboto justify-center mb-1">
                 Your rating:
-              </h4>{" "}
-              <Rating defaultValue={rating} precision={0.5} />
+              </h4>
+              <Rating value={rating} precision={0.5} readOnly />
             </div>
           ) : (
             <></>
@@ -168,9 +170,12 @@ function BookInfo({ currentUser }) {
               {currentBook.description}
             </p>
           }
-
           <h4 className="text-base text-slate-600 mt-4 font-roboto ">
-            Friends who have read this book:
+            You said:
+          </h4>
+          <p className="text-sm italic">"{myReview}"</p>
+          <h4 className="text-base text-slate-600 mt-4 font-roboto ">
+            Friends said:
           </h4>
         </div>
         <div className="flex justify-center p-6 pt-2 gap-7"></div>

@@ -1,6 +1,13 @@
 import React, { useState } from "react";
 import { Rating } from "@mui/material";
-import { addToBookshelf, deleteFromBookshelf } from "../api/api";
+import {
+  addToBookshelf,
+  deleteFromBookshelf,
+  deleteFromReadJournal,
+  markBookAsRead,
+  updateJournal,
+} from "../api/api";
+import ShareButton from "./ShareButton";
 
 function BookMenu({
   isOnBookshelf,
@@ -18,9 +25,25 @@ function BookMenu({
   const [isExiting, setIsExiting] = useState(false);
   const [backdropExiting, setBackdropExiting] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [review, setReview] = useState(null);
+  const [value, setValue] = useState(0);
 
   const handleRead = (e) => {
-    console.log("read");
+    setIsLoading(true);
+    if (isRead) {
+      deleteFromReadJournal(id, isbn).then((data) => {
+        setIsRead(false);
+
+        setIsLoading(false);
+      });
+    }
+    if (!isRead) {
+      markBookAsRead(isbn, rating, review, id).then((data) => {
+        setIsRead(true);
+        setIsOnBookshelf(false);
+        setIsLoading(false);
+      });
+    }
   };
 
   const handleBookshelf = (e) => {
@@ -39,17 +62,24 @@ function BookMenu({
     }
   };
 
-  const handleShare = (e) => {
-    console.log("share");
+  const handleSetReview = (e) => {
+    setReview(e.target.value);
   };
 
   const handleReview = (e) => {
-    console.log("review");
+    e.preventDefault();
+    const update = { review, isbn };
+    updateJournal(update, id).then((data) => {
+      console.log(data);
+      setMyReview(data.review);
+    });
   };
 
   const handleRating = (e) => {
-    setRating(e.target.value);
-    console.log(e.target.value);
+    const update = { rating: e.target.value, isbn };
+    updateJournal(update, id).then((data) => {
+      setRating(data.rating);
+    });
   };
 
   const handleClose = () => {
@@ -80,6 +110,7 @@ function BookMenu({
               <button
                 className="flex flex-col items-center"
                 onClick={handleRead}
+                disabled={isLoading}
               >
                 {isRead ? (
                   <svg
@@ -138,48 +169,53 @@ function BookMenu({
                     />
                   </svg>
                 )}
-                Bookshelf
+                <p className="ml-1">Bookshelf</p>
               </button>
-
-              <button
-                className="flex flex-col items-center"
-                onClick={handleShare}
-              >
-                <svg
-                  className="h-12 w-12 text-slate-200"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                >
-                  {" "}
-                  <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />{" "}
-                  <polyline points="16 6 12 2 8 6" />{" "}
-                  <line x1="12" y1="2" x2="12" y2="15" />
-                </svg>
-                Share
-              </button>
+              <div>
+                <ShareButton />
+                <p className="ml-1">Share</p>
+              </div>
             </div>
 
             <div className="flex flex-col items-center">
               <hr className="bg-gray-100 border-0 clear-both w-9/10 h-0.5 mt-2 mb-2" />
-              <button onClick={handleReview}>Write a Review</button>
-              <hr className="bg-gray-100 border-0 clear-both w-9/10 h-0.5 mt-2 mb-2" />
-              {isRead ? (
-                <div className="flex flex-col items-center">
-                  <h2 className="mb-1">Your Rating</h2>
-                  <Rating precision={0.5} value={rating} readOnly />
-                </div>
-              ) : (
-                <div className="flex flex-col items-center">
-                  <h2 className="mb-1">Rate</h2>
-                  <Rating precision={0.5} onChange={handleRating} />
-                </div>
-              )}
 
+              <div className="flex flex-col items-center">
+                <h2 className="mb-1">{rating ? "Your Rating" : "Rate"}</h2>
+                <Rating
+                  value={rating ? rating : value}
+                  onChange={(event, newValue) => {
+                    setValue(newValue);
+                  }}
+                  onClick={handleRating}
+                />
+              </div>
               <hr className="bg-gray-100 border-0 clear-both w-9/10 h-0.5 mt-2 mb-2" />
+              {isRead && review === "" ? (
+                <form
+                  className="mb-1 flex flex-col items-center"
+                  onSubmit={handleReview}
+                >
+                  <div className="py-1 px-2 mb-2 w-80 bg-white rounded-lg rounded-t-lg border border-gray-200">
+                    <textarea
+                      id="review"
+                      rows="3"
+                      className="px-0 w-full text-sm text-gray-900 border-0"
+                      placeholder="Write a review..."
+                      required
+                      onChange={handleSetReview}
+                    ></textarea>
+                  </div>
+                  <button
+                    type="submit"
+                    className="inline-flex items-center py-2.5 px-4 text-xs font-medium text-center text-white button rounded-lg"
+                  >
+                    Post review
+                  </button>
+                </form>
+              ) : (
+                <></>
+              )}
               <button className="mb-2" onClick={handleClose}>
                 Close
               </button>

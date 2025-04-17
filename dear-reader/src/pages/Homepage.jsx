@@ -110,7 +110,7 @@ function Homepage({ currentUser }) {
       {!bookQuote ? (
         <></>
       ) : (
-        <div className="mb-8">
+        <div className="mb-4">
           <RandomQuote bookQuote={bookQuote} />
         </div>
       )}

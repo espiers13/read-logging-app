@@ -11,7 +11,7 @@ function ProfileTabs({ page, currentUser }) {
         <button
           type="button"
           className={`w-full px-4 py-2 text-sm font-medium text-gray-900 border rounded-l-lg ${
-            page === "profile" ? "active-button" : "button"
+            page === "profile" ? "active-button" : "profile-tabs"
           }`}
           onClick={() => {
             navigate(`/${id}/profile`);
@@ -22,7 +22,7 @@ function ProfileTabs({ page, currentUser }) {
         <button
           type="button"
           className={`w-full px-4 py-2 text-sm font-medium text-gray-900 border-t border-b ${
-            page === "journal" ? "active-button" : "button"
+            page === "journal" ? "active-button" : "profile-tabs"
           }`}
           onClick={() => {
             navigate(`/${id}/journal`);
@@ -33,7 +33,7 @@ function ProfileTabs({ page, currentUser }) {
         <button
           type="button"
           className={`w-full px-4 py-2 text-sm font-medium text-gray-900 border-t border-b border-l ${
-            page === "bookshelf" ? "active-button" : "button"
+            page === "bookshelf" ? "active-button" : "profile-tabs"
           }`}
           onClick={() => {
             navigate(`/${id}/bookshelf`);
@@ -44,7 +44,7 @@ function ProfileTabs({ page, currentUser }) {
         <button
           type="button"
           className={`w-full px-4 py-2 text-sm font-medium text-gray-900 border rounded-r-lg ${
-            page === "friends" ? "active-button" : "button"
+            page === "friends" ? "active-button" : "profile-tabs"
           }`}
           onClick={() => {
             navigate(`/${id}/friends`);

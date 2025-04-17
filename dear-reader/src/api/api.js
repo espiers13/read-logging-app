@@ -170,10 +170,21 @@ export const addToBookshelf = (user_id, isbn, title) => {
 };
 
 export const markBookAsRead = (isbn, rating, review, user_id) => {
-  const input = { isbn: isbn, rating: rating, review: review };
+  const input = { isbn, rating, review };
 
   return userApi
-    .patch(`/bookshelf/${user_id}/move`, input)
+    .post(`/bookshelf/${user_id}/read`, input)
+    .then(({ data }) => {
+      return data;
+    })
+    .catch((err) => {
+      throw err;
+    });
+};
+
+export const updateJournal = (update, user_id) => {
+  return userApi
+    .patch(`/journal/${user_id}`, update)
     .then(({ data }) => {
       return data;
     })

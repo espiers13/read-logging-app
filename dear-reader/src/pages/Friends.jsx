@@ -14,7 +14,6 @@ function Friends({ currentUser }) {
   useEffect(() => {
     setIsLoading(true);
     getFriendRequestsByUserId(currentUser.id).then((data) => {
-      console.log(data);
       setPendingFriends(data);
       setIsLoading(false);
     });

@@ -112,6 +112,11 @@ main {
 
 .button {
   background-color: #42517d;
+  color: #f6f6f6;
+}
+
+.profile-tabs {
+  background-color: #42517d;
   color: #b3b3b3;
 }
 

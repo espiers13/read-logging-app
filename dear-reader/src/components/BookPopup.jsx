@@ -6,17 +6,21 @@ import {
   getBookshelf,
   deleteFromBookshelf,
   markBookAsRead,
+  deleteFromReadJournal,
+  updateJournal,
+  addToBookshelf,
 } from "../api/api";
 
 function BookPopup({ setPopup, book, currentUser }) {
   const navigate = useNavigate();
   const { thumbnail, title, isbn, authors, description } = book;
   const [readPopup, setReadPopup] = useState(false);
-  const [rating, setRating] = useState(0);
-  const [review, setReview] = useState("");
+  const [rating, setRating] = useState(null);
+  const [review, setReview] = useState(null);
   const [isRead, setIsRead] = useState(false);
   const [isOnBookshelf, setIsOnBookshelf] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [value, setValue] = useState(0);
 
   const { id, username } = currentUser;
 
@@ -44,18 +48,20 @@ function BookPopup({ setPopup, book, currentUser }) {
       .textContent || "";
 
   const handleMarkAsRead = (e) => {
+    setIsLoading(true);
     setReadPopup(true);
     setIsRead(true);
-    markBookAsRead(isbn, e.target.value, review, id);
-  };
-
-  const handleRating = (e) => {
-    setRating(e.target.value);
-    setIsRead(true);
-    markBookAsRead(isbn, e.target.value, review, id);
+    markBookAsRead(isbn, rating, review, id).then((data) => {
+      setIsRead(true);
+      setIsOnBookshelf(false);
+      setIsLoading(false);
+    });
   };
 
   const handleDelete = (e) => {
+    setIsLoading(true);
+    setRating(null);
+    setValue(0);
     deleteFromBookshelf(id, isbn).then(() => {
       window.location.reload();
     });
@@ -67,11 +73,29 @@ function BookPopup({ setPopup, book, currentUser }) {
 
   const handleReview = (e) => {
     e.preventDefault();
-    markBookAsRead(isbn, rating, review, id);
+    const update = { review, isbn };
+    updateJournal(update, id).then((data) => {
+      console.log(data);
+      setMyReview(data.review);
+    });
+  };
+
+  const handleRating = (e) => {
+    const update = { rating: e.target.value, isbn };
+    updateJournal(update, id).then((data) => {
+      setRating(data.rating);
+    });
   };
 
   const handleRemoveFromJournal = (e) => {
-    console.log("remove from journal");
+    setIsLoading(true);
+    deleteFromReadJournal(id, isbn).then((data) => {
+      setIsRead(false);
+      addToBookshelf(id, isbn, title).then((data) => {
+        setIsOnBookshelf(true);
+        setIsLoading(false);
+      });
+    });
   };
 
   return (
@@ -146,22 +170,26 @@ function BookPopup({ setPopup, book, currentUser }) {
                 </button>
               )}
             </div>
-            <Rating
-              name="half-rating"
-              precision={0.5}
-              onChange={handleRating}
-              readOnly={rating}
-            />
-            {readPopup ? (
-              <form class="mb-6" onSubmit={handleReview}>
-                <div class="py-2 px-4 mb-4 bg-white rounded-lg rounded-t-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
-                  <label for="comment" class="sr-only">
-                    Your comment
-                  </label>
+            <div className="flex flex-col items-center">
+              <h4 className="mb-1">{rating ? "Your Rating" : "Rate"}</h4>
+              <Rating
+                value={rating ? rating : value}
+                onChange={(event, newValue) => {
+                  setValue(newValue);
+                }}
+                onClick={handleRating}
+              />
+            </div>
+            {isRead ? (
+              <form
+                className="mb-1 flex flex-col items-center"
+                onSubmit={handleReview}
+              >
+                <div className="py-1 px-2 mb-2 w-80 bg-white rounded-lg rounded-t-lg border border-gray-200">
                   <textarea
-                    id="comment"
+                    id="review"
                     rows="3"
-                    class="px-0 w-full text-sm text-gray-900 border-0"
+                    className="px-0 w-full text-sm text-gray-900 border-0"
                     placeholder="Write a review..."
                     required
                     onChange={handleSetReview}
@@ -169,7 +197,7 @@ function BookPopup({ setPopup, book, currentUser }) {
                 </div>
                 <button
                   type="submit"
-                  class="inline-flex items-center py-2.5 px-4 text-xs font-medium text-center text-white button rounded-lg"
+                  className="inline-flex items-center py-2.5 px-4 text-xs font-medium text-center text-white button rounded-lg"
                 >
                   Post review
                 </button>

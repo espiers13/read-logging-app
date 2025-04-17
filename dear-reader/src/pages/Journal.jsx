@@ -14,8 +14,7 @@ function Journal({ currentUser }) {
     setDates([]);
     setIsLoading(true);
     getReadJournal(currentUser.username).then((journalData) => {
-      const recentBooks = journalData.slice(0, 3);
-      const promises = recentBooks.map((book) => {
+      const promises = journalData.map((book) => {
         return getBookByIsbn(book.isbn).then(({ items }) => {
           const newBook = {
             thumbnail: items[0].volumeInfo.imageLinks.thumbnail,
@@ -45,16 +44,21 @@ function Journal({ currentUser }) {
     });
   }, [currentUser.id]);
 
-  const groupedBooks = journal.reduce((acc, book) => {
-    const month = new Date(book.date_read).toLocaleString("default", {
-      month: "long",
-    });
-    if (!acc[month]) {
-      acc[month] = [];
-    }
-    acc[month].push(book);
-    return acc;
-  }, {});
+  const groupedBooks = journal
+    .sort((a, b) => new Date(b.date_read) - new Date(a.date_read))
+    .reduce((acc, book) => {
+      const monthYear = new Date(book.date_read).toLocaleString("default", {
+        month: "long",
+        year: "numeric",
+      });
+
+      if (!acc[monthYear]) {
+        acc[monthYear] = [];
+      }
+
+      acc[monthYear].push(book);
+      return acc;
+    }, {});
 
   return (
     <main className="mb-10">
@@ -66,30 +70,28 @@ function Journal({ currentUser }) {
         <Loading />
       ) : (
         <ul>
-          {Object.keys(groupedBooks).map((month, index) => {
-            return (
-              <li key={index}>
-                <div className="bar w-screen p-1 mb-4">
-                  <p className="ml-2">{month}</p>
-                </div>
+          {Object.keys(groupedBooks).map((monthYear) => (
+            <li key={monthYear}>
+              <div className="bar w-screen p-1 mb-4">
+                <p className="ml-2 font-semibold text-lg">{monthYear}</p>
+              </div>
 
-                <ul className="mb-5">
-                  {groupedBooks[month].map((book, bookIndex) => {
-                    const isLastBook =
-                      bookIndex === groupedBooks[month].length - 1;
-                    return (
-                      <li key={bookIndex}>
-                        <JournalCard book={book} currentUser={currentUser} />
-                        {!isLastBook && (
-                          <hr className="bar border-0 clear-both w-full h-0.5 mt-2 mb-2" />
-                        )}
-                      </li>
-                    );
-                  })}
-                </ul>
-              </li>
-            );
-          })}
+              <ul className="mb-5">
+                {groupedBooks[monthYear].map((book, bookIndex) => {
+                  const isLastBook =
+                    bookIndex === groupedBooks[monthYear].length - 1;
+                  return (
+                    <li key={book.id || `${book.isbn}-${bookIndex}`}>
+                      <JournalCard book={book} currentUser={currentUser} />
+                      {!isLastBook && (
+                        <hr className="bar border-0 clear-both w-full h-0.5 mt-2 mb-2" />
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
+            </li>
+          ))}
         </ul>
       )}
     </main>

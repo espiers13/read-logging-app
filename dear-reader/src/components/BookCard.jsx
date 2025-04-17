@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router";
-function BestSellers({ book }) {
+function BookCard({ book }) {
   const { book_image, title, primary_isbn10 } = book;
   const navigate = useNavigate();
 
@@ -14,4 +14,4 @@ function BestSellers({ book }) {
   );
 }
 
-export default BestSellers;
+export default BookCard;

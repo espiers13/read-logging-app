@@ -100,6 +100,19 @@ export const createNewUser = (newUser) => {
     });
 };
 
+export const updateUserDetails = (username, password, newData) => {
+  const input = { username, password, newData };
+  return userApi
+    .patch(`/user`, input)
+    .then(({ data }) => {
+      return data;
+    })
+    .catch((err) => {
+      console.log(err);
+      throw err;
+    });
+};
+
 export const loginUser = (user) => {
   return userApi
     .post(`/login`, user)
@@ -131,6 +144,32 @@ export const deleteFromReadJournal = (id, isbn) => {
 export const getFavourites = (user_id) => {
   return userApi
     .get(`/${user_id}/favourites`)
+    .then(({ data }) => {
+      return data;
+    })
+    .catch((err) => {
+      throw err;
+    });
+};
+
+export const deleteFromFavourites = (user_id, isbn) => {
+  const input = { user_id: user_id, isbn: isbn };
+
+  return userApi
+    .post(`/favourites/delete`, input)
+    .then(({ data }) => {
+      return data;
+    })
+    .catch((err) => {
+      throw err;
+    });
+};
+
+export const addToFavourites = (user_id, newBook) => {
+  const input = { user_id, newBook };
+
+  return userApi
+    .post(`/favourites`, input)
     .then(({ data }) => {
       return data;
     })

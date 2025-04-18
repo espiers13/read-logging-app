@@ -5,7 +5,8 @@ import Loading from "../components/Loading";
 import { useNavigate } from "react-router-dom";
 import BookMenu from "../components/BookMenu";
 import Rating from "@mui/material/Rating";
-import { getReadJournal, getBookshelf } from "../api/api";
+import { getReadJournal, getBookshelf, getFriendsByUserId } from "../api/api";
+import FriendsWhoHaveRead from "../components/FriendsWhoHaveRead";
 
 function BookInfo({ currentUser }) {
   const [isLoading, setIsLoading] = useState(false);
@@ -23,6 +24,7 @@ function BookInfo({ currentUser }) {
     navigate(-1);
   };
   const [myReview, setMyReview] = useState("");
+  const [readMore, setReadMore] = useState(false);
 
   useEffect(() => {
     setIsLoading(true);
@@ -50,6 +52,10 @@ function BookInfo({ currentUser }) {
     });
   }, [book_id]);
 
+  const handleReadMore = (e) => {
+    setReadMore(!readMore);
+  };
+
   if (!currentBook) {
     return <Loading />;
   }
@@ -61,7 +67,7 @@ function BookInfo({ currentUser }) {
   }
 
   return (
-    <main className="">
+    <main className="mb-5">
       {popup ? (
         <BookMenu
           isOnBookshelf={isOnBookshelf}
@@ -161,22 +167,40 @@ function BookInfo({ currentUser }) {
             );
           })}
 
-          {
+          <div>
             <p
-              className={
-                "text-sm mt-3 font-roboto overflow-hidden line-clamp-4"
-              }
+              className={`text-xs mt-3 font-roboto overflow-hidden ${
+                !readMore ? "description-text" : ""
+              }`}
             >
               {currentBook.description}
             </p>
-          }
-          <h4 className="text-base text-slate-600 mt-4 font-roboto ">
-            You said:
-          </h4>
-          <p className="text-sm italic">"{myReview}"</p>
-          <h4 className="text-base text-slate-600 mt-4 font-roboto ">
-            Friends said:
-          </h4>
+            <button
+              onClick={handleReadMore}
+              className="mt-1 text-sm underline text-gray-400"
+            >
+              {readMore ? "Read less" : "Read more"}
+            </button>
+          </div>
+
+          {myReview ? (
+            <>
+              <hr className="border-0 h-px bg-gray-300 my-2" />
+              <h4 className="text-base text-slate-600 mt-4 font-roboto ">
+                You said:
+              </h4>
+              <p className="text-sm italic">"{myReview}"</p>
+              <hr className="border-0 h-px bg-gray-300 my-2" />
+            </>
+          ) : (
+            <></>
+          )}
+
+          <FriendsWhoHaveRead
+            currentUser={currentUser}
+            isbn={book_id}
+            myReview={myReview}
+          />
         </div>
         <div className="flex justify-center p-6 pt-2 gap-7"></div>
       </div>

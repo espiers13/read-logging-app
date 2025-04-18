@@ -88,6 +88,18 @@ main {
   }
 }
 
+.banner {
+  background-color: #1c2540;
+}
+
+.description-text {
+  display: -webkit-box;
+  -webkit-line-clamp: 6; /* Change this number to however many lines you want */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .search-container {
   position: relative;
 }
@@ -100,6 +112,22 @@ main {
   border: none;
   background-color: #617891;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.rotate-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  cursor: pointer;
+}
+
+.icon {
+  transition: transform 0.3s ease;
+}
+
+.icon.rotated {
+  transform: rotate(90deg);
 }
 
 .search-icon {
@@ -129,6 +157,10 @@ main {
   background-color: #617891;
 }
 
+.book-menu-top-shadow {
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.2);
+}
+
 .quote {
   background-color: #42517d;
   color: #b3b3b3;
@@ -147,4 +179,29 @@ main {
 .bar {
   background-color: #42517d;
   color: #b3b3b3;
+}
+
+.input-settings {
+  background-color: #506378;
+  color: #f6f6f6;
+}
+
+.popup-container {
+  position: fixed;
+  bottom: -100%;
+  left: 0;
+  width: 100%;
+  background: #ffffff;
+  transition: bottom 0.3s ease-in-out;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+.popup-container.show {
+  bottom: 0;
+}
+
+.popup-content {
+  padding: 20px;
+  border-top: 1px solid #ddd;
 }

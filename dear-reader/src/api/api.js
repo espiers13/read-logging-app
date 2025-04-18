@@ -16,9 +16,13 @@ const userApi = axios.create({
   baseURL: "https://dear-reader-backend.onrender.com/api",
 });
 
+const openLibrary = axios.create({
+  baseURL: "https://openlibrary.org/api",
+});
+
 const nytKey = "TeQkGTyrIZAealqg2ZdcNa7V9x01IZVj";
 
-const googleBooksKey = "AIzaSyAbtrbN1oivlDmrVumaSTLz268zlXc92qk";
+const googleBooksKey = "AIzaSyAaehyiaB7KOgp3o2OI_u5WB9XZ7iJhUDo";
 
 export const getBestSellers = async (retries = 5, delay = 1000) => {
   const url = `/lists/current/hardcover-fiction.json?api-key=${nytKey}`;
@@ -49,6 +53,19 @@ export const getBookByIsbn = (book_isbn) => {
     })
     .catch((err) => {
       console.log(err);
+    });
+};
+
+export const fetchBookByISBN = (isbn) => {
+  const url = `/books?bibkeys=ISBN:${isbn}&format=json&jscmd=data`;
+
+  return openLibrary
+    .get(url)
+    .then(({ data }) => {
+      return data[`ISBN:${isbn}`];
+    })
+    .catch((err) => {
+      throw err;
     });
 };
 
@@ -108,7 +125,32 @@ export const updateUserDetails = (username, password, newData) => {
       return data;
     })
     .catch((err) => {
-      console.log(err);
+      throw err;
+    });
+};
+
+export const updateUserPassword = (username, password, newPassword) => {
+  const input = { username, password, newPassword };
+  return userApi
+    .patch(`/user/password`, input)
+    .then(({ data }) => {
+      return data;
+    })
+    .catch((err) => {
+      throw err;
+    });
+};
+
+export const deleteUser = (username, password) => {
+  const input = { username, password };
+  console.log(input);
+
+  return userApi
+    .post(`/user/delete`, input)
+    .then(({ data }) => {
+      return data;
+    })
+    .catch((err) => {
       throw err;
     });
 };

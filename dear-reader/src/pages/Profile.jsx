@@ -1,6 +1,6 @@
 import ProfileTabs from "../components/ProfileTabs";
 import { useState, useEffect } from "react";
-import { getReadJournal, getBookByIsbn } from "../api/api";
+import { getReadJournal, getBookByIsbn, fetchBookByISBN } from "../api/api";
 import RecentActivity from "../components/RecentActivity";
 import Loading from "../components/Loading";
 import Favourites from "../components/Favourites";
@@ -18,9 +18,11 @@ function Profile({ currentUser }) {
     getReadJournal(currentUser.username).then((journalData) => {
       const recentBooks = journalData.slice(0, 3);
       const promises = recentBooks.map((book) => {
-        return getBookByIsbn(book.isbn).then(({ items }) => {
+        return fetchBookByISBN(book.isbn).then((data) => {
           const newBook = {
-            thumbnail: items[0].volumeInfo.imageLinks.thumbnail,
+            thumbnail:
+              data.cover?.large ||
+              "https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg?20200913095930",
             title: book.title,
             rating: book.rating,
             date_read: book.date_read,
@@ -41,10 +43,12 @@ function Profile({ currentUser }) {
     setFavouritesLoading(true);
     getFavourites(currentUser.id).then((favouritesData) => {
       const promises = favouritesData.map((favourite) => {
-        return getBookByIsbn(favourite.isbn).then(({ items }) => {
+        return fetchBookByISBN(favourite.isbn).then((data) => {
           const newBook = {
-            thumbnail: items[0].volumeInfo.imageLinks.thumbnail,
-            title: items[0].volumeInfo.title,
+            thumbnail:
+              data.cover?.large ||
+              "https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg?20200913095930",
+            title: data.title,
             isbn: favourite.isbn,
           };
           return newBook;

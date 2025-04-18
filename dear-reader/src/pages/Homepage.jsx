@@ -3,9 +3,9 @@ import {
   getBestSellers,
   getRandomQuote,
   getBookshelf,
-  getBookByIsbn,
   getFriendsByUserId,
   getReadJournal,
+  fetchBookByISBN,
 } from "../api/api";
 import BookCard from "../components/BookCard.jsx";
 import Loading from "../components/Loading";
@@ -19,6 +19,7 @@ function Homepage({ currentUser }) {
   const [bookshelf, setBookshelf] = useState([]);
   const [friendsActivity, setFriendsActivity] = useState([]);
   const [hasFriends, setHasFriends] = useState(false);
+  const [bookshelfLoading, setBookshelfLoading] = useState(false);
 
   useEffect(() => {
     setIsLoading(true);
@@ -53,11 +54,13 @@ function Homepage({ currentUser }) {
               (a, b) => new Date(b.date_read) - new Date(a.date_read)
             )[0];
 
-            return getBookByIsbn(mostRecentBook.isbn).then((bookData) => {
+            return fetchBookByISBN(mostRecentBook.isbn).then((data) => {
               return {
                 username,
                 avatar,
-                book_image: bookData.items[0].volumeInfo.imageLinks.thumbnail,
+                book_image:
+                  data.cover?.large ||
+                  "https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg?20200913095930",
                 title: mostRecentBook.title,
                 isbn: mostRecentBook.isbn,
                 rating: mostRecentBook.rating,
@@ -82,12 +85,14 @@ function Homepage({ currentUser }) {
 
   useEffect(() => {
     setBookshelf([]);
-    setIsLoading(true);
+    setBookshelfLoading(true);
     getBookshelf(currentUser.username).then((bookshelfData) => {
       const promises = bookshelfData.map((book) => {
-        return getBookByIsbn(book.isbn).then(({ items }) => {
+        return fetchBookByISBN(book.isbn).then((data) => {
           const newBook = {
-            book_image: items[0].volumeInfo.imageLinks.thumbnail,
+            book_image:
+              data.cover?.large ||
+              "https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg?20200913095930",
             title: book.title,
             primary_isbn10: book.isbn,
           };
@@ -96,7 +101,7 @@ function Homepage({ currentUser }) {
       });
       Promise.all(promises).then((newBooks) => {
         setBookshelf((prevBookshelf) => [...prevBookshelf, ...newBooks]);
-        setIsLoading(false);
+        setBookshelfLoading(false);
       });
     });
   }, [currentUser.id]);
@@ -139,13 +144,17 @@ function Homepage({ currentUser }) {
         <></>
       )}
       <p className="font-roboto tracking-widest mt-4">On your bookshelf</p>
-      <div className="flex overflow-x-scroll hide-scroll-bar mt-4 shadow-2xl">
-        <div className="flex flex-nowrap ">
-          {bookshelf.map((book, index) => {
-            return <BookCard book={book} key={index} />;
-          })}
+      {bookshelfLoading ? (
+        <Loading />
+      ) : (
+        <div className="flex overflow-x-scroll hide-scroll-bar mt-4 shadow-2xl">
+          <div className="flex flex-nowrap ">
+            {bookshelf.map((book, index) => {
+              return <BookCard book={book} key={index} />;
+            })}
+          </div>
         </div>
-      </div>
+      )}
     </main>
   );
 }

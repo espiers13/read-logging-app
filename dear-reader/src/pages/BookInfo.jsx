@@ -1,11 +1,10 @@
-import { getBookByIsbn } from "../api/api";
 import { useParams } from "react-router";
 import { useState, useEffect } from "react";
 import Loading from "../components/Loading";
 import { useNavigate } from "react-router-dom";
 import BookMenu from "../components/BookMenu";
 import Rating from "@mui/material/Rating";
-import { getReadJournal, getBookshelf, getFriendsByUserId } from "../api/api";
+import { getReadJournal, getBookshelf, fetchBookByISBN } from "../api/api";
 import FriendsWhoHaveRead from "../components/FriendsWhoHaveRead";
 
 function BookInfo({ currentUser }) {
@@ -25,13 +24,22 @@ function BookInfo({ currentUser }) {
   };
   const [myReview, setMyReview] = useState("");
   const [readMore, setReadMore] = useState(false);
+  const [description, setDescription] = useState("");
 
   useEffect(() => {
     setIsLoading(true);
-    getBookByIsbn(book_id).then(({ items }) => {
-      setCurrentBook(items[0].volumeInfo), setIsLoading(false);
-    });
-  }, [book_id]);
+    fetchBookByISBN(book_id)
+      .then((data) => {
+        if (!data) {
+          navigate(`/book/404`);
+        }
+        setCurrentBook(data);
+        setIsLoading(false);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, []);
 
   useEffect(() => {
     setIsLoading(true);
@@ -60,7 +68,7 @@ function BookInfo({ currentUser }) {
     return <Loading />;
   }
 
-  image = currentBook.imageLinks?.thumbnail || image;
+  image = currentBook.cover.large || image;
 
   if (isLoading) {
     return <Loading />;
@@ -152,20 +160,11 @@ function BookInfo({ currentUser }) {
                 className="text-sm font-roboto text-slate-500 uppercase"
                 key={index}
               >
-                by {author}
+                by {author.name}
               </p>
             );
           })}
-          {currentBook.categories.map((category, index) => {
-            return (
-              <p
-                className="inline-flex items-center mt-3 bg-gray-400 rounded-sm px-3 py-1 text-sm font-semibold"
-                key={index}
-              >
-                {category}
-              </p>
-            );
-          })}
+          <p className="text-sm">{currentBook.publish_date}</p>
 
           <div>
             <p
@@ -173,7 +172,7 @@ function BookInfo({ currentUser }) {
                 !readMore ? "description-text" : ""
               }`}
             >
-              {currentBook.description}
+              {description}
             </p>
             <button
               onClick={handleReadMore}
@@ -195,6 +194,21 @@ function BookInfo({ currentUser }) {
           ) : (
             <></>
           )}
+
+          <p className="text-center text-sm mt-3">Categories</p>
+          <div className="flex flex-wrap gap-2 mt-3 justify-center items-center">
+            {currentBook.subjects
+              .filter((category) => /^[A-Z]/.test(category.name))
+              .map((category, index) => (
+                <button
+                  key={index}
+                  className="text-xs bg-gray-400 rounded-xl px-2 py-1 text-center"
+                  onClick={() => navigate(`/search/genre/${category.name}`)}
+                >
+                  {category.name}
+                </button>
+              ))}
+          </div>
 
           <FriendsWhoHaveRead
             currentUser={currentUser}

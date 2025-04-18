@@ -29,9 +29,6 @@ function JournalCard({ book, currentUser }) {
   const date = new Date(date_read);
   const dateRead = date.getDate();
 
-  const publishedDate = new Date(published);
-  const datePublished = publishedDate.getFullYear();
-
   return (
     <main className="mt-2.5 mb-2.5">
       <div className="flex items-center space-x-4">
@@ -47,12 +44,12 @@ function JournalCard({ book, currentUser }) {
         <div className="flex-1 min-w-0">
           <p className="mb-0.5">{title}</p>
           {authors.length > 1 ? (
-            <p className="mb-0.5 text-xs">by {authors[0]} et al.</p>
+            <p className="mb-0.5 text-xs">by {authors[0].name} et al.</p>
           ) : (
-            <p className="mb-0.5 text-xs">by {authors[0]}</p>
+            <p className="mb-0.5 text-xs">by {authors[0].name}</p>
           )}
 
-          <p className="text-sm text-gray-500 mb-0.5">{datePublished}</p>
+          <p className="text-sm text-gray-500 mb-0.5">{published}</p>
           {rating && (
             <Rating
               name="read-only"

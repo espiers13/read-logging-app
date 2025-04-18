@@ -66,7 +66,7 @@ function Footer({ currentUser }) {
             <line x1="8" y1="12" x2="16" y2="12" />
           </svg>
         </button>
-        <button onClick={() => navigate("/friends")}>
+        <button onClick={() => navigate(`/${currentUser.id}/friends/activity`)}>
           <svg
             className="h-8 w-8 text-slate-50"
             width="24"

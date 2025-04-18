@@ -133,7 +133,7 @@ function BookPopup({ setPopup, book, currentUser }) {
                   {book.title}
                 </h2>
                 <p className="text-sm text-gray-500 mt-1 italic">
-                  by {authors}
+                  by {authors[0].name}
                 </p>
                 <p className="text-sm text-gray-500 mt-2">{decodedText}</p>
               </div>

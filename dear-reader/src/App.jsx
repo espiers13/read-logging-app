@@ -19,6 +19,8 @@ import Bookshelf from "./pages/Bookshelf";
 import Journal from "./pages/Journal";
 import FriendProfile from "./pages/FriendProfile";
 import MobileOnlyGate from "./components/MobileOnlyGate";
+import BookNotFound from "./pages/BookNotFound";
+import FriendActivity from "./pages/FriendActivity";
 
 function App() {
   const [currentUser, setCurrentUser] = useState(() => {
@@ -86,6 +88,10 @@ function App() {
               element={<Friends currentUser={currentUser} />}
             />
             <Route
+              path="/:user_id/friends/activity"
+              element={<FriendActivity currentUser={currentUser} />}
+            />
+            <Route
               path="/:user_id/bookshelf"
               element={<Bookshelf currentUser={currentUser} />}
             />
@@ -112,6 +118,7 @@ function App() {
               path="/user/:friend_username/:friend_id"
               element={<FriendProfile currentUser={currentUser} />}
             />
+            <Route path="/book/404" element={<BookNotFound />} />
 
             {/* Page Not Found Route */}
             <Route path="*" element={<Navigate to="/404" />} />

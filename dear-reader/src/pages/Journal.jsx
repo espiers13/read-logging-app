@@ -1,5 +1,5 @@
 import ProfileTabs from "../components/ProfileTabs";
-import { getReadJournal, getBookByIsbn } from "../api/api";
+import { getReadJournal, fetchBookByISBN } from "../api/api";
 import { useState, useEffect } from "react";
 import Loading from "../components/Loading";
 import JournalCard from "../components/JournalCard";
@@ -15,15 +15,17 @@ function Journal({ currentUser }) {
     setIsLoading(true);
     getReadJournal(currentUser.username).then((journalData) => {
       const promises = journalData.map((book) => {
-        return getBookByIsbn(book.isbn).then(({ items }) => {
+        return fetchBookByISBN(book.isbn).then((data) => {
           const newBook = {
-            thumbnail: items[0].volumeInfo.imageLinks.thumbnail,
+            thumbnail:
+              data.cover?.large ||
+              "https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg?20200913095930",
             title: book.title,
             rating: book.rating,
             date_read: book.date_read,
             review: book.review,
-            published: items[0].volumeInfo.publishedDate,
-            authors: items[0].volumeInfo.authors,
+            published: data.publish_date,
+            authors: data.authors,
             isbn: book.isbn,
           };
           return newBook;

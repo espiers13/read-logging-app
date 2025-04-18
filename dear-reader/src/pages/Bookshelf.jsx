@@ -1,5 +1,5 @@
 import ProfileTabs from "../components/ProfileTabs";
-import { getBookshelf, getBookByIsbn } from "../api/api";
+import { getBookshelf, getBookByIsbn, fetchBookByISBN } from "../api/api";
 import { useState, useEffect } from "react";
 import Loading from "../components/Loading";
 import BookshelfCard from "../components/BookshelfCard";
@@ -14,14 +14,16 @@ function Bookshelf({ currentUser }) {
     setIsLoading(true);
     getBookshelf(username).then((bookshelfData) => {
       const promises = bookshelfData.map((book) => {
-        return getBookByIsbn(book.isbn).then(({ items }) => {
+        return fetchBookByISBN(book.isbn).then((data) => {
           const newBook = {
-            thumbnail: items[0].volumeInfo.imageLinks.thumbnail,
+            thumbnail:
+              data.cover?.large ||
+              "https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg?20200913095930",
             title: book.title,
             isbn: book.isbn,
-            published: items[0].volumeInfo.publishedDate,
-            authors: items[0].volumeInfo.authors,
-            description: items[0].searchInfo.textSnippet,
+            published: data.publish_date,
+            authors: data.authors,
+            description: "",
           };
           return newBook;
         });

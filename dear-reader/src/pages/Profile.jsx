@@ -9,12 +9,11 @@ import { getFavourites } from "../api/api";
 function Profile({ currentUser }) {
   const [favourites, setFavourites] = useState([]);
   const [recentActivity, setRecentActivity] = useState([]);
-  const [recentActivityLoading, setRecentActivityLoading] = useState(false);
-  const [favouritesLoading, setFavouritesLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     setRecentActivity([]);
-    setRecentActivityLoading(true);
+    setIsLoading(true);
     getReadJournal(currentUser.username).then((journalData) => {
       const recentBooks = journalData.slice(0, 3);
       const promises = recentBooks.map((book) => {
@@ -33,14 +32,12 @@ function Profile({ currentUser }) {
       });
       Promise.all(promises).then((newBooks) => {
         setRecentActivity((prevActivity) => [...prevActivity, ...newBooks]);
-        setRecentActivityLoading(false);
       });
     });
   }, [currentUser.id]);
 
   useEffect(() => {
     setFavourites([]);
-    setFavouritesLoading(true);
     getFavourites(currentUser.id).then((favouritesData) => {
       const promises = favouritesData.map((favourite) => {
         return fetchBookByISBN(favourite.isbn).then((data) => {
@@ -56,7 +53,7 @@ function Profile({ currentUser }) {
       });
       Promise.all(promises).then((newBooks) => {
         setFavourites((prevFavourites) => [...prevFavourites, ...newBooks]);
-        setFavouritesLoading(false);
+        setIsLoading(false);
       });
     });
   }, [currentUser.id]);
@@ -69,35 +66,38 @@ function Profile({ currentUser }) {
 
       <div className="flex items-center justify-center flex-col mt-4">
         <img src={avatar} className="w-24 h-24 rounded-full" />
+        <p>{currentUser.username}</p>
+        {currentUser.pronouns && <p>{currentUser.pronouns}</p>}
 
         <hr className="bar border-0 clear-both w-full h-0.5 mt-2 mb-2" />
-
-        <h1 className="text-left w-full pl-4">FAVOURITES</h1>
-
-        {favouritesLoading ? (
-          <Loading />
+        {isLoading ? (
+          <div>
+            <Loading />
+            Loading your account details...
+          </div>
         ) : (
-          <div className="grid grid-cols-3 gap-0 w-full">
-            {favourites.map((favourite, index) => {
-              return <Favourites favourite={favourite} key={index} />;
-            })}
+          <div>
+            <h1 className="text-left w-full pl-4">FAVOURITES</h1>
+
+            <div className="grid grid-cols-3 gap-0 w-full">
+              {favourites.map((favourite, index) => {
+                return <Favourites favourite={favourite} key={index} />;
+              })}
+            </div>
+
+            <hr className="bar border-0 clear-both w-full h-0.5 mt-2 mb-2" />
+
+            <h1 className="text-left w-full pl-4">RECENT ACTIVITY</h1>
+
+            <div className="grid grid-cols-3 gap-0 w-full">
+              {recentActivity.map((book, index) => {
+                return <RecentActivity book={book} key={index} />;
+              })}
+            </div>
+
+            <hr className="bar border-0 clear-both w-full h-0.5 mt-2 mb-2" />
           </div>
         )}
-
-        <hr className="bar border-0 clear-both w-full h-0.5 mt-2 mb-2" />
-
-        <h1 className="text-left w-full pl-4">RECENT ACTIVITY</h1>
-
-        {recentActivityLoading ? (
-          <Loading />
-        ) : (
-          <div className="grid grid-cols-3 gap-0 w-full">
-            {recentActivity.map((book, index) => {
-              return <RecentActivity book={book} key={index} />;
-            })}
-          </div>
-        )}
-        <hr className="bar border-0 clear-both w-full h-0.5 mt-2 mb-2" />
       </div>
     </main>
   );

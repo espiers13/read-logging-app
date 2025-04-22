@@ -15,17 +15,16 @@ import FriendsActivityCard from "../components/FriendsActivityCard.jsx";
 function Homepage({ currentUser }) {
   const [isLoading, setIsLoading] = useState(false);
   const [trendingList, setTrendingList] = useState([]);
-  const [bookQuote, setBookQuote] = useState({});
+  const [bookQuote, setBookQuote] = useState(null);
   const [bookshelf, setBookshelf] = useState([]);
   const [friendsActivity, setFriendsActivity] = useState([]);
   const [hasFriends, setHasFriends] = useState(false);
-  const [bookshelfLoading, setBookshelfLoading] = useState(false);
 
   useEffect(() => {
     setIsLoading(true);
     getRandomQuote().then((data) => {
       setBookQuote(data);
-      setIsLoading(false);
+      // setIsLoading(false);
     });
   }, []);
 
@@ -33,7 +32,7 @@ function Homepage({ currentUser }) {
     setIsLoading(true);
     getBestSellers().then((data) => {
       setTrendingList(data.results.books);
-      setIsLoading(false);
+      // setIsLoading(false);
     });
   }, []);
 
@@ -79,13 +78,13 @@ function Homepage({ currentUser }) {
         console.error("Error fetching friends activity:", error);
       })
       .finally(() => {
-        setIsLoading(false);
+        // setIsLoading(false);
       });
   }, [currentUser.id]);
 
   useEffect(() => {
+    setIsLoading(true);
     setBookshelf([]);
-    setBookshelfLoading(true);
     getBookshelf(currentUser.username).then((bookshelfData) => {
       const promises = bookshelfData.map((book) => {
         return fetchBookByISBN(book.isbn).then((data) => {
@@ -101,7 +100,7 @@ function Homepage({ currentUser }) {
       });
       Promise.all(promises).then((newBooks) => {
         setBookshelf((prevBookshelf) => [...prevBookshelf, ...newBooks]);
-        setBookshelfLoading(false);
+        setIsLoading(false);
       });
     });
   }, [currentUser.id]);
@@ -144,17 +143,14 @@ function Homepage({ currentUser }) {
         <></>
       )}
       <p className="font-roboto tracking-widest mt-4">On your bookshelf</p>
-      {bookshelfLoading ? (
-        <Loading />
-      ) : (
-        <div className="flex overflow-x-scroll hide-scroll-bar mt-4 shadow-2xl">
-          <div className="flex flex-nowrap ">
-            {bookshelf.map((book, index) => {
-              return <BookCard book={book} key={index} />;
-            })}
-          </div>
+
+      <div className="flex overflow-x-scroll hide-scroll-bar mt-4 shadow-2xl">
+        <div className="flex flex-nowrap ">
+          {bookshelf.map((book, index) => {
+            return <BookCard book={book} key={index} />;
+          })}
         </div>
-      )}
+      </div>
     </main>
   );
 }

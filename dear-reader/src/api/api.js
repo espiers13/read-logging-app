@@ -20,6 +20,10 @@ const openLibrary = axios.create({
   baseURL: "https://openlibrary.org/api",
 });
 
+const openLibrarySearch = axios.create({
+  baseURL: "https://openlibrary.org",
+});
+
 const nytKey = "TeQkGTyrIZAealqg2ZdcNa7V9x01IZVj";
 
 const googleBooksKey = "AIzaSyAaehyiaB7KOgp3o2OI_u5WB9XZ7iJhUDo";
@@ -78,6 +82,24 @@ export const searchBooks = (search_query, params) => {
     })
     .catch((err) => {
       throw err;
+    });
+};
+
+export const searchOpenLibrary = (search_query, params) => {
+  let search = "q";
+  if (params) {
+    search = params;
+  }
+
+  const url = `search.json?${search}=${search_query}`;
+
+  return openLibrarySearch
+    .get(url)
+    .then(({ data }) => {
+      console.log(data);
+    })
+    .catch((err) => {
+      console.log(err);
     });
 };
 

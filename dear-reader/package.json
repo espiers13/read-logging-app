@@ -21,6 +21,7 @@
     "animate.css": "^4.1.1",
     "autoprefixer": "^10.4.21",
     "axios": "^1.8.4",
+    "browser-image-compression": "^2.0.2",
     "firebase": "^11.6.0",
     "jquery": "^3.7.1",
     "lottie-react": "^2.4.1",

@@ -14,6 +14,15 @@ import AddNewFavourite from "../components/AddNewFavourite";
 import Loading from "../components/Loading";
 import UploadNewAvatar from "../components/UploadNewAvatar";
 
+import {
+  ref,
+  uploadBytes,
+  getDownloadURL,
+  listAll,
+  deleteObject,
+} from "firebase/storage";
+import { storageRef } from "../api/firebase";
+
 function Settings({ currentUser, setCurrentUser }) {
   const { username, avatar, email, id, pronouns } = currentUser;
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -41,6 +50,8 @@ function Settings({ currentUser, setCurrentUser }) {
   const [deletePopup, setDeletePopup] = useState(false);
   const [deletePassword, setDeletePassword] = useState("");
   const [passwordError, setPasswordError] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState("");
+  const [avatarUpdate, setAvatarUpdate] = useState(null);
 
   useEffect(() => {
     setFavourites([]);
@@ -138,10 +149,6 @@ function Settings({ currentUser, setCurrentUser }) {
     setCheckPassword(e.target.value);
   };
 
-  const handleAvatar = (e) => {
-    console.log("avatar");
-  };
-
   const handleDeleteConfirm = (e) => {
     setDeletePopup(!deletePopup);
   };
@@ -150,7 +157,6 @@ function Settings({ currentUser, setCurrentUser }) {
     setUpdateLoading(true);
     deleteUser(username, deletePassword)
       .then((data) => {
-        console.log(data);
         setCurrentUser(null);
         localStorage.removeItem("currentUser");
         navigate("/login");
@@ -162,43 +168,95 @@ function Settings({ currentUser, setCurrentUser }) {
 
   const updateUser = (e) => {
     e.preventDefault();
-    setUpdateLoading(true);
-    const newData = {
-      pronouns: pronounsUpdate,
-      username: usernameUpdate,
-      email: emailUpdate,
-    };
-    updateUserDetails(username, checkPassword, newData)
-      .then((data) => {
-        const user = { username: data.username, password: checkPassword };
-        setUserError("");
-        loginUser(user)
-          .then((data) => {
-            setCurrentUser(data);
-            setCheckPassword("");
-            setUpdateLoading(false);
-            setUserUpdated(true);
-            setFadeOut(false);
-            setTimeout(() => {
-              setFadeOut(true);
-            }, 1500);
-            setTimeout(() => {
-              setUserUpdated(false);
-            }, 2000);
-          })
-          .catch((err) => {
-            setUserError(err.response.data.msg);
-            setUpdateLoading(false);
-          });
-      })
-      .catch((err) => {
-        setUserError(err.response.data.msg);
-        setUpdateLoading(false);
-      });
-  };
+    if (avatarUpdate !== null) {
+      const userFolderRef = ref(storageRef, `avatars/${currentUser.id}`);
+      const newFileRef = ref(userFolderRef, `${currentUser.id}-avatar`);
 
-  const handleDeletePasswordCheck = (e) => {
-    setDeletePassword(e.target.value);
+      setUpdateLoading(true);
+
+      listAll(userFolderRef)
+        .then((res) => {
+          const deletePromises = res.items.map((itemRef) =>
+            deleteObject(itemRef)
+          );
+          return Promise.all(deletePromises);
+        })
+        .then(() => uploadBytes(newFileRef, avatarUpdate))
+        .then((snapshot) => {
+          return getDownloadURL(snapshot.ref);
+        })
+        .then((downloadURL) => {
+          const newData = {
+            pronouns: pronounsUpdate,
+            username: usernameUpdate,
+            email: emailUpdate,
+            avatar: downloadURL,
+          };
+
+          return updateUserDetails(username, checkPassword, newData);
+        })
+        .then((data) => {
+          const user = { username: data.username, password: checkPassword };
+          setUserError("");
+          loginUser(user)
+            .then((data) => {
+              setCurrentUser(data);
+              setCheckPassword("");
+              setUpdateLoading(false);
+              setUserUpdated(true);
+              setFadeOut(false);
+              setTimeout(() => {
+                setFadeOut(true);
+              }, 1500);
+              setTimeout(() => {
+                setUserUpdated(false);
+                navigate(`/${currentUser.id}/profile`);
+              }, 2000);
+            })
+            .catch((err) => {
+              setUserError(err.response.data.msg);
+              setUpdateLoading(false);
+            });
+        })
+        .catch((err) => {
+          setUserError(err.response.data.msg);
+          setUpdateLoading(false);
+        });
+    } else {
+      const newData = {
+        pronouns: pronounsUpdate,
+        username: usernameUpdate,
+        email: emailUpdate,
+      };
+      updateUserDetails(username, checkPassword, newData)
+        .then((data) => {
+          const user = { username: data.username, password: checkPassword };
+          setUserError("");
+          loginUser(user)
+            .then((data) => {
+              setCurrentUser(data);
+              setCheckPassword("");
+              setUpdateLoading(false);
+              setUserUpdated(true);
+              setFadeOut(false);
+              setTimeout(() => {
+                setFadeOut(true);
+              }, 1500);
+              setTimeout(() => {
+                setUserUpdated(false);
+                navigate(`/${currentUser.id}/profile`);
+              }, 2000);
+            })
+            .catch((err) => {
+              setUserError(err.response.data.msg);
+              setUpdateLoading(false);
+            });
+        })
+        .catch((err) => {
+          setUserError(err.response.data.msg);
+          setUpdateLoading(false);
+        });
+    }
   };
 
   return (
@@ -219,7 +277,7 @@ function Settings({ currentUser, setCurrentUser }) {
             fadeOut ? "animate__fadeOut" : ""
           }`}
         >
-          Profile updated successfully!
+          Profile updated successfully! Returning to profile...
         </div>
       )}
       <div className="book-menu rounded-lg">
@@ -409,7 +467,10 @@ function Settings({ currentUser, setCurrentUser }) {
                   <hr className="border-0 h-px mt-0.5 bg-gray-600" />
                 </li>
                 <li className="ml-1 mr-3 mt-2">
-                  <UploadNewAvatar currentUser={currentUser} />
+                  <UploadNewAvatar
+                    currentUser={currentUser}
+                    setAvatarUpdate={setAvatarUpdate}
+                  />
                 </li>
                 <hr className="border-0 h-px mt-0.5 bg-gray-600" />
                 <li className="ml-1 mr-3 mt-2 text-center flex flex-col items-center gap-2">

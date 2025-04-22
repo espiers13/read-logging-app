@@ -1,7 +1,7 @@
 import { useParams } from "react-router";
 import { useState, useEffect } from "react";
 import Loading from "../components/Loading";
-import { searchBooks } from "../api/api";
+import { searchBooks, searchOpenLibrary } from "../api/api";
 import SearchBar from "../components/SearchBar";
 import SearchResultsCard from "../components/SearchResultsCard";
 import { useNavigate } from "react-router-dom";
@@ -27,14 +27,14 @@ function SearchResults() {
 
   useEffect(() => {
     setIsLoading(true);
-    setError(null); // Reset error before new search
+    setError(null);
     searchBooks(search_query, params)
       .then(({ items }) => {
         if (items && items.length > 0) {
           setSearchResults(items);
         } else {
           setSearchResults([]);
-          setError(404); // Set error if no results
+          setError(404);
         }
         setIsLoading(false);
       })
@@ -43,6 +43,10 @@ function SearchResults() {
         setIsLoading(false);
       });
   }, [search_query, params]);
+
+  useEffect(() => {
+    searchOpenLibrary(search_query, params);
+  }, []);
 
   searchResults.sort((a, b) => {
     const dateA = new Date(a.volumeInfo.publishedDate);

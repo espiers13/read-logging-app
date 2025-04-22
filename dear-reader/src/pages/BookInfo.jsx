@@ -4,7 +4,12 @@ import Loading from "../components/Loading";
 import { useNavigate } from "react-router-dom";
 import BookMenu from "../components/BookMenu";
 import Rating from "@mui/material/Rating";
-import { getReadJournal, getBookshelf, fetchBookByISBN } from "../api/api";
+import {
+  getReadJournal,
+  getBookshelf,
+  fetchBookByISBN,
+  getBookByIsbn,
+} from "../api/api";
 import FriendsWhoHaveRead from "../components/FriendsWhoHaveRead";
 
 function BookInfo({ currentUser }) {
@@ -25,21 +30,49 @@ function BookInfo({ currentUser }) {
   const [myReview, setMyReview] = useState("");
   const [readMore, setReadMore] = useState(false);
   const [description, setDescription] = useState("");
+  const [subjects, setSubjects] = useState([]);
 
   useEffect(() => {
     setIsLoading(true);
-    fetchBookByISBN(book_id)
-      .then((data) => {
-        if (!data) {
-          navigate(`/book/404`);
-        }
-        setCurrentBook(data);
-        setIsLoading(false);
+    getBookByIsbn(book_id)
+      .then(({ items }) => {
+        setDescription(items[0].volumeInfo.description);
+        console.log(items);
+        const book = {
+          description: items[0].volumeInfo.description,
+          title: items[0].volumeInfo.title,
+          authors: items[0].volumeInfo.authors,
+          image: items[0].volumeInfo.imageLinks.thumbnail,
+        };
+        setCurrentBook(book);
       })
       .catch((err) => {
         console.log(err);
+        setIsLoading(false);
       });
   }, []);
+
+  useEffect(() => {
+    fetchBookByISBN(book_id).then((data) => {
+      console.log(data);
+      setSubjects(data?.subjects ?? []);
+    });
+  }, []);
+
+  // useEffect(() => {
+  //   setIsLoading(true);
+  //   fetchBookByISBN(book_id)
+  //     .then((data) => {
+  //       if (!data) {
+  //         navigate(`/book/404`);
+  //       }
+  //       setCurrentBook(data);
+  //       setIsLoading(false);
+  //     })
+  //     .catch((err) => {
+  //       console.log(err);
+  //     });
+  // }, []);
 
   useEffect(() => {
     setIsLoading(true);
@@ -68,7 +101,7 @@ function BookInfo({ currentUser }) {
     return <Loading />;
   }
 
-  image = currentBook.cover.large || image;
+  image = currentBook.image || image;
 
   if (isLoading) {
     return <Loading />;
@@ -197,7 +230,7 @@ function BookInfo({ currentUser }) {
 
           <p className="text-center text-sm mt-3">Categories</p>
           <div className="flex flex-wrap gap-2 mt-3 justify-center items-center">
-            {currentBook.subjects
+            {subjects
               .filter((category) => /^[A-Z]/.test(category.name))
               .map((category, index) => (
                 <button

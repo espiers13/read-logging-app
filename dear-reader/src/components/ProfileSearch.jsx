@@ -1,27 +1,35 @@
 import { useState } from "react";
-import { useNavigate } from "react-router";
-import { getIdByUsername } from "../api/api";
+import { searchUsers } from "../api/api";
+import ProfileCard from "./ProfileCard";
 
-function ProfileSearch() {
+function ProfileSearch({ currentUser }) {
   const [searchUsername, setSearchUsername] = useState("");
-  const navigate = useNavigate();
+  const [typingTimeout, setTypingTimeout] = useState(null);
+  const [users, setUsers] = useState([]);
 
   const handleUsername = (e) => {
-    setSearchUsername(e.target.value);
-  };
+    const value = e.target.value;
+    setSearchUsername(value);
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    getIdByUsername(searchUsername).then((user) => {
-      navigate(`/user/${user.username}/${user.id}`);
-    });
-    // navigate(`/user/${username}`);
+    if (typingTimeout) clearTimeout(typingTimeout);
+    const timeout = setTimeout(() => {
+      setUsers([]);
+      if (value.trim() !== "") {
+        searchUsers(value).then((data) => {
+          const filteredUsers = data.filter(
+            (user) => user.username !== currentUser.username
+          );
+          setUsers(filteredUsers);
+        });
+      }
+    }, 500);
+
+    setTypingTimeout(timeout);
   };
 
   return (
     <form className="max-w-md mt-2 ml-2 mr-2 ">
       <div className="w-full max-w-sm min-w-[200px] flex flex-col items-center">
-        {/* Search Input */}
         <div className="relative w-full">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -41,21 +49,20 @@ function ProfileSearch() {
             className="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded-md pl-10 pr-3 py-2 transition duration-300 ease shadow-sm"
             placeholder="Search username..."
             onChange={handleUsername}
+            value={searchUsername}
             required
           />
         </div>
-
-        {/* Search Button placed underneath and centered */}
-        <div className="mt-4 w-full text-center">
-          <button
-            className="rounded-md button py-1 px-3 border border-transparent text-sm text-white transition-all shadow-md"
-            type="submit"
-            onClick={handleSearch}
-          >
-            Search
-          </button>
-        </div>
       </div>
+
+      {users.map((user) => {
+        return (
+          <div key={user.id}>
+            <ProfileCard user={user} currentUser={currentUser} />
+            <hr className="bar border-0 clear-both w-full h-0.5 mt-2 mb-2" />
+          </div>
+        );
+      })}
     </form>
   );
 }

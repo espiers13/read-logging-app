@@ -32,8 +32,7 @@ function SignUp({ setCurrentUser }) {
         setIsLoading(false);
       })
       .catch((err) => {
-        console.log(err);
-        setErrorMsg("Username and password don't match");
+        setErrorMsg(err.response.data.msg);
         setIsLoading(false);
       });
   };

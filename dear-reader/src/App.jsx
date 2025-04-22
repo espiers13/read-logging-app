@@ -1,6 +1,5 @@
 import { Route, Routes, Navigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import useIsMobile from "./custom-hooks/useIsMobile";
 import "./index.css";
 import Footer from "./components/Footer";
 import Homepage from "./pages/Homepage";
@@ -27,7 +26,6 @@ function App() {
     const savedUser = localStorage.getItem("currentUser");
     return savedUser ? JSON.parse(savedUser) : null;
   });
-  const isMobile = useIsMobile();
 
   useEffect(() => {
     if (currentUser) {
@@ -43,7 +41,6 @@ function App() {
         <Header currentUser={currentUser} setCurrentUser={setCurrentUser} />
         <main className="flex-grow">
           <Routes>
-            {/* Conditional route for homepage */}
             <Route
               path="/"
               element={

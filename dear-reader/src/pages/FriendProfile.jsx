@@ -6,6 +6,8 @@ import {
   getFavourites,
   getFriendsByUserId,
   sendFriendRequest,
+  getFriendRequestsByUserId,
+  deleteFriend,
 } from "../api/api";
 import { useEffect, useState } from "react";
 import Loading from "../components/Loading";
@@ -22,8 +24,8 @@ function FriendProfile({ currentUser }) {
   const [favouritesLoading, setFavouritesLoading] = useState(false);
   const [recentActivityLoading, setRecentActivityLoading] = useState(false);
   const [isFriend, setIsFriend] = useState(false);
-  const [requestSend, setRequestSent] = useState("");
-  const [isDisabled, setIsDisabled] = useState(false);
+  const [isPending, setIsPending] = useState(false);
+  const [requestSent, setRequestSent] = useState("");
   const [buttonLoading, setButtonLoading] = useState(false);
 
   useEffect(() => {
@@ -87,17 +89,31 @@ function FriendProfile({ currentUser }) {
     });
   }, [friend_id]);
 
+  useEffect(() => {
+    getFriendRequestsByUserId(friend_id).then((data) => {
+      setIsPending(
+        data.some(
+          (obj) =>
+            obj.username === currentUser.username && obj.status === "pending"
+        )
+      );
+    });
+  }, [friend_id]);
+
   const handleAddFriend = (e) => {
     setButtonLoading(true);
     sendFriendRequest(friend_id, currentUser.id).then((request) => {
       setRequestSent(request);
+      setIsPending(true);
       setButtonLoading(false);
-      setIsDisabled(true);
     });
   };
 
   const handleRemoveFriend = (e) => {
-    console.log("remove friend");
+    setButtonLoading(true);
+    deleteFriend(friend_id, currentUser.id).then(() => {
+      setIsPending(false)(window.location.reload());
+    });
   };
 
   if (isLoading) {
@@ -108,7 +124,7 @@ function FriendProfile({ currentUser }) {
     <main>
       <div className="flex items-center justify-center flex-col mt-1">
         <img src={userData.avatar} className="w-24 h-24 rounded-full" />
-
+        {userData.pronouns && <p className="text-sm">{userData.pronouns}</p>}
         <hr className="bar border-0 clear-both w-full h-0.5 mt-5 mb-2" />
 
         {favourites.length > 0 ? (
@@ -154,22 +170,27 @@ function FriendProfile({ currentUser }) {
           <button
             className="button px-2 py-0.5 rounded-lg"
             onClick={handleRemoveFriend}
-            disabled={isDisabled}
           >
             {buttonLoading ? <LoadingButton /> : <p>Remove Friend</p>}
+          </button>
+        ) : isPending ? (
+          <button
+            className="button px-2 py-0.5 rounded-lg"
+            onClick={handleRemoveFriend}
+          >
+            {buttonLoading ? <LoadingButton /> : <p>Cancel Friend Request</p>}
           </button>
         ) : (
           <button
             className="button px-2 py-0.5 rounded-lg"
             onClick={handleAddFriend}
-            disabled={isDisabled}
           >
             {buttonLoading ? <LoadingButton /> : <p>Add Friend</p>}
           </button>
         )}
       </div>
       <div className="flex justify-center mt-2">
-        <p>{requestSend}</p>
+        <p>{requestSent}</p>
       </div>
     </main>
   );

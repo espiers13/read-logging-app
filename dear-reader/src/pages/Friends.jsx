@@ -62,7 +62,7 @@ function Friends({ currentUser }) {
                   const isLastFriend = friendIndex === friendsList.length - 1;
                   return (
                     <div key={friend.id}>
-                      <FriendsCard friend={friend} />
+                      <FriendsCard friend={friend} currentUser={currentUser} />
                       {!isLastFriend && (
                         <hr className="bar border-0 clear-both w-full h-0.5 mt-2 mb-2" />
                       )}
@@ -79,7 +79,7 @@ function Friends({ currentUser }) {
       <div className="mt-2">
         <hr className="bar border-0 clear-both w-full h-0.5 mt-2 mb-2" />
         <p className="text-lg font-serif">Search for a Profile</p>
-        <ProfileSearch />
+        <ProfileSearch currentUser={currentUser} />
       </div>
     </main>
   );

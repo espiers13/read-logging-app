@@ -329,6 +329,18 @@ export const getIdByUsername = (username) => {
     });
 };
 
+export const searchUsers = (search_query) => {
+  const input = { search_query };
+  return userApi
+    .post(`/search/users`, input)
+    .then(({ data }) => {
+      return data;
+    })
+    .catch((err) => {
+      throw err;
+    });
+};
+
 export const getFriendRequestsByUserId = (user_id) => {
   return userApi
     .get(`/friends/pending/${user_id}`)
@@ -363,4 +375,12 @@ export const acceptFriendRequest = (friend_id, user_id) => {
     .catch((err) => {
       throw err;
     });
+};
+
+export const deleteFriend = (friend_id, user_id) => {
+  const input = { user_id };
+
+  return userApi.post(`/friends/delete/${friend_id}`, input).catch((err) => {
+    throw err;
+  });
 };

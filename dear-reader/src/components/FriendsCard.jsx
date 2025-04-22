@@ -1,13 +1,13 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import DeleteFriendPopup from "./DeleteFriendPopup";
 
-function FriendsCard({ friend }) {
+function FriendsCard({ friend, currentUser }) {
   const navigate = useNavigate();
   const [popup, setPopup] = useState(false);
 
   const manageRemoveFriend = (e) => {
     setPopup(!popup);
-    console.log(popup);
   };
 
   return (
@@ -30,6 +30,14 @@ function FriendsCard({ friend }) {
         <button onClick={manageRemoveFriend} className="text-sm text-gray-500">
           remove friend
         </button>
+        {popup && (
+          <DeleteFriendPopup
+            setPopup={setPopup}
+            friend={friend}
+            popup={popup}
+            user_id={currentUser.id}
+          />
+        )}
       </div>
     </div>
   );

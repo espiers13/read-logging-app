@@ -66,8 +66,10 @@ function Profile({ currentUser }) {
 
       <div className="flex items-center justify-center flex-col mt-4">
         <img src={avatar} className="w-24 h-24 rounded-full" />
-        <p>{currentUser.username}</p>
-        {currentUser.pronouns && <p>{currentUser.pronouns}</p>}
+        <p className="font-serif">{currentUser.username}</p>
+        {currentUser.pronouns && (
+          <p className="text-sm">{currentUser.pronouns}</p>
+        )}
 
         <hr className="bar border-0 clear-both w-full h-0.5 mt-2 mb-2" />
         {isLoading ? (

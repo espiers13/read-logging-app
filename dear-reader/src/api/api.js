@@ -96,7 +96,20 @@ export const searchOpenLibrary = (search_query, params) => {
   return openLibrarySearch
     .get(url)
     .then(({ data }) => {
-      console.log(data);
+      return data;
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+};
+
+export const getISBNByOL = (olCode) => {
+  const url = `/books/${olCode}.json`;
+
+  return openLibrarySearch
+    .get(url)
+    .then(({ data }) => {
+      return data.isbn_13;
     })
     .catch((err) => {
       console.log(err);

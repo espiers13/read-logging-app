@@ -1,11 +1,14 @@
 import { useLocation, useNavigate } from "react-router-dom";
+import FooterAddPopup from "./FooterAddPopup";
+import { useState } from "react";
 
 function Footer({ currentUser }) {
   const { pathname } = useLocation();
   const navigate = useNavigate();
+  const [popup, setPopup] = useState(true);
 
   const handleAdd = (e) => {
-    console.log("add");
+    setPopup(!popup);
   };
 
   if (pathname === "/login") {
@@ -101,6 +104,13 @@ function Footer({ currentUser }) {
           </svg>
         </button>
       </div>
+      {popup && (
+        <FooterAddPopup
+          currentUser={currentUser}
+          popup={popup}
+          setPopup={setPopup}
+        />
+      )}
     </footer>
   );
 }

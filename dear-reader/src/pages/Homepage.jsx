@@ -5,7 +5,7 @@ import {
   getBookshelf,
   getFriendsByUserId,
   getReadJournal,
-  fetchBookByISBN,
+  getBookByIsbn,
 } from "../api/api";
 import BookCard from "../components/BookCard.jsx";
 import Loading from "../components/Loading";
@@ -53,12 +53,13 @@ function Homepage({ currentUser }) {
               (a, b) => new Date(b.date_read) - new Date(a.date_read)
             )[0];
 
-            return fetchBookByISBN(mostRecentBook.isbn).then((data) => {
+            return getBookByIsbn(mostRecentBook.isbn).then(({ items }) => {
+              const book = items[0].volumeInfo;
               return {
                 username,
                 avatar,
                 book_image:
-                  data.cover?.large ||
+                  book.imageLinks?.thumbnail ||
                   "https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg?20200913095930",
                 title: mostRecentBook.title,
                 isbn: mostRecentBook.isbn,
@@ -76,9 +77,6 @@ function Homepage({ currentUser }) {
       })
       .catch((error) => {
         console.error("Error fetching friends activity:", error);
-      })
-      .finally(() => {
-        // setIsLoading(false);
       });
   }, [currentUser.id]);
 
@@ -87,10 +85,11 @@ function Homepage({ currentUser }) {
     setBookshelf([]);
     getBookshelf(currentUser.username).then((bookshelfData) => {
       const promises = bookshelfData.map((book) => {
-        return fetchBookByISBN(book.isbn).then((data) => {
+        return getBookByIsbn(book.isbn).then(({ items }) => {
+          const foundBook = items[0].volumeInfo;
           const newBook = {
             book_image:
-              data.cover?.large ||
+              foundBook.imageLinks?.thumbnail ||
               "https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg?20200913095930",
             title: book.title,
             primary_isbn10: book.isbn,

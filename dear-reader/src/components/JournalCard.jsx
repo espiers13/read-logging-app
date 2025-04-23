@@ -6,7 +6,6 @@ import DeletePopup from "./DeletePopup";
 
 function JournalCard({ book, currentUser }) {
   const { id } = currentUser;
-
   const navigate = useNavigate();
   const {
     date_read,
@@ -44,9 +43,9 @@ function JournalCard({ book, currentUser }) {
         <div className="flex-1 min-w-0">
           <p className="mb-0.5">{title}</p>
           {authors.length > 1 ? (
-            <p className="mb-0.5 text-xs">by {authors[0].name} et al.</p>
+            <p className="mb-0.5 text-xs">by {authors[0]} et al.</p>
           ) : (
-            <p className="mb-0.5 text-xs">by {authors[0].name}</p>
+            <p className="mb-0.5 text-xs">by {authors[0]}</p>
           )}
 
           <p className="text-sm text-gray-500 mb-0.5">{published}</p>

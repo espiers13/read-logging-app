@@ -1,5 +1,6 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import ShareButton from "./ShareButton";
+import ShareProfile from "./ShareProfile";
 
 function Header({ currentUser, setCurrentUser }) {
   const { pathname } = useLocation();
@@ -174,7 +175,7 @@ function Header({ currentUser, setCurrentUser }) {
           </svg>
         </button>
         <h1 className="font-serif text-4xl mt-3">{currentUser.username}</h1>
-        <ShareButton />
+        <ShareProfile currentUser={currentUser} />
       </header>
     );
   }

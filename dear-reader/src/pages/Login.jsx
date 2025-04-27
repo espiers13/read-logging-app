@@ -43,9 +43,6 @@ function Login({ setCurrentUser }) {
           <h2 className="text-center text-5xl tracking-tight font-serif">
             Login
           </h2>
-          <h2 className="mt-1 text-center text-sm tracking-tight font-roboto">
-            Sign in to continue
-          </h2>
         </div>
 
         <div className="mt-5 sm:mx-auto sm:w-full sm:max-w-sm">

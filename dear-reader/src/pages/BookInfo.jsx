@@ -9,8 +9,11 @@ import {
   getBookshelf,
   fetchBookByISBN,
   getBookByIsbn,
+  getCurrentlyReading,
+  markBookAsRead,
 } from "../api/api";
 import FriendsWhoHaveRead from "../components/FriendsWhoHaveRead";
+import BookReadPopup from "../components/BookReadPopup";
 
 function BookInfo({ currentUser }) {
   const [isLoading, setIsLoading] = useState(false);
@@ -18,11 +21,13 @@ function BookInfo({ currentUser }) {
   const [popup, setPopup] = useState(false);
   const [isRead, setIsRead] = useState(false);
   const [isOnBookshelf, setIsOnBookshelf] = useState(false);
+  const [currentlyReading, setCurrentlyReading] = useState(false);
+  const [logPopup, setLogPopup] = useState(false);
   const [rating, setRating] = useState(0);
   const navigate = useNavigate();
   let image =
     "https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg?20200913095930";
-  const { username } = currentUser;
+  const { username, id } = currentUser;
   const { book_id } = useParams();
   const handleGoBack = () => {
     navigate(-1);
@@ -37,64 +42,69 @@ function BookInfo({ currentUser }) {
     getBookByIsbn(book_id)
       .then(({ items }) => {
         setDescription(items[0].volumeInfo.description);
-        console.log(items);
         const book = {
           description: items[0].volumeInfo.description,
           title: items[0].volumeInfo.title,
           authors: items[0].volumeInfo.authors,
           image: items[0].volumeInfo.imageLinks.thumbnail,
+          published: items[0].volumeInfo.publishedDate,
+          isbn: book_id,
         };
         setCurrentBook(book);
       })
       .catch((err) => {
         console.log(err);
-        setIsLoading(false);
       });
   }, []);
 
   useEffect(() => {
     fetchBookByISBN(book_id).then((data) => {
-      console.log(data);
       setSubjects(data?.subjects ?? []);
     });
   }, []);
 
-  // useEffect(() => {
-  //   setIsLoading(true);
-  //   fetchBookByISBN(book_id)
-  //     .then((data) => {
-  //       if (!data) {
-  //         navigate(`/book/404`);
-  //       }
-  //       setCurrentBook(data);
-  //       setIsLoading(false);
-  //     })
-  //     .catch((err) => {
-  //       console.log(err);
-  //     });
-  // }, []);
-
   useEffect(() => {
-    setIsLoading(true);
     getReadJournal(username).then((books) => {
       setIsRead(books.some((book) => book.isbn === book_id));
       const list = books.find((book) => book.isbn === book_id);
       setRating(list ? list.rating : null);
-      setIsLoading(false);
       setMyReview(list ? list.review : null);
     });
   }, [book_id]);
 
   useEffect(() => {
-    setIsLoading(true);
+    if (currentBook && currentBook.isbn) {
+      getCurrentlyReading(id)
+        .then((data) => {
+          let isbn = null;
+          if (data && data.isbn) {
+            isbn = data.isbn;
+          }
+          if (!isbn || isbn !== currentBook.isbn) {
+            setCurrentlyReading(false);
+          }
+          if (isbn === currentBook.isbn) {
+            setCurrentlyReading(true);
+          }
+        })
+        .catch((error) => {
+          console.error("Error fetching currently reading:", error);
+        });
+    }
+  }, [id, currentBook]);
+
+  useEffect(() => {
     getBookshelf(username).then((books) => {
       setIsOnBookshelf(books.some((book) => book.isbn === book_id));
       setIsLoading(false);
     });
   }, [book_id]);
-
   const handleReadMore = (e) => {
     setReadMore(!readMore);
+  };
+
+  const handleMarkAsFinished = (e) => {
+    setLogPopup(true);
   };
 
   if (!currentBook) {
@@ -109,8 +119,20 @@ function BookInfo({ currentUser }) {
 
   return (
     <main className="mb-5">
+      {logPopup && (
+        <BookReadPopup
+          book={currentBook}
+          currentUser={currentUser}
+          setPopup={setLogPopup}
+          setIsRead={setIsRead}
+          isRead={isRead}
+          currentlyReading={currentlyReading}
+          setCurrentlyReading={setCurrentlyReading}
+        />
+      )}
       {popup ? (
         <BookMenu
+          book={currentBook}
           isOnBookshelf={isOnBookshelf}
           setPopup={setPopup}
           isRead={isRead}
@@ -121,6 +143,10 @@ function BookInfo({ currentUser }) {
           isbn={book_id}
           setIsRead={setIsRead}
           setIsOnBookshelf={setIsOnBookshelf}
+          currentlyReading={currentlyReading}
+          setCurrentlyReading={setCurrentlyReading}
+          logPopup={logPopup}
+          setLogPopup={setLogPopup}
         />
       ) : (
         <></>
@@ -184,6 +210,7 @@ function BookInfo({ currentUser }) {
           ) : (
             <></>
           )}
+
           <p className="mb-1 text-xl font-semibold text-slate-800 font-serif">
             {currentBook.title}
           </p>
@@ -193,7 +220,7 @@ function BookInfo({ currentUser }) {
                 className="text-sm font-roboto text-slate-500 uppercase"
                 key={index}
               >
-                by {author.name}
+                by {author}
               </p>
             );
           })}
@@ -214,7 +241,14 @@ function BookInfo({ currentUser }) {
               {readMore ? "Read less" : "Read more"}
             </button>
           </div>
-
+          {currentlyReading && (
+            <div className="mt-2 bar py-2 rounded-lg">
+              <p>You are currently reading this book</p>
+              <button className="mt-1 underline" onClick={handleMarkAsFinished}>
+                Mark book as finished?
+              </button>
+            </div>
+          )}
           {myReview ? (
             <>
               <hr className="border-0 h-px bg-gray-300 my-2" />
@@ -227,21 +261,24 @@ function BookInfo({ currentUser }) {
           ) : (
             <></>
           )}
-
-          <p className="text-center text-sm mt-3">Categories</p>
-          <div className="flex flex-wrap gap-2 mt-3 justify-center items-center">
-            {subjects
-              .filter((category) => /^[A-Z]/.test(category.name))
-              .map((category, index) => (
-                <button
-                  key={index}
-                  className="text-xs bg-gray-400 rounded-xl px-2 py-1 text-center"
-                  onClick={() => navigate(`/search/genre/${category.name}`)}
-                >
-                  {category.name}
-                </button>
-              ))}
-          </div>
+          {subjects.length < 0 && (
+            <div>
+              <p className="text-center text-sm mt-3">Categories</p>
+              <div className="flex flex-wrap gap-2 mt-3 justify-center items-center">
+                {subjects
+                  .filter((category) => /^[A-Z]/.test(category.name))
+                  .map((category, index) => (
+                    <button
+                      key={index}
+                      className="text-xs bg-gray-400 rounded-xl px-2 py-1 text-center"
+                      onClick={() => navigate(`/search/genre/${category.name}`)}
+                    >
+                      {category.name}
+                    </button>
+                  ))}
+              </div>
+            </div>
+          )}
 
           <FriendsWhoHaveRead
             currentUser={currentUser}

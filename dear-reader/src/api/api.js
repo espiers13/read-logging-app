@@ -288,6 +288,8 @@ export const addToBookshelf = (user_id, isbn, title) => {
 export const markBookAsRead = (isbn, rating, review, user_id) => {
   const input = { isbn, rating, review };
 
+  console.log(input, user_id);
+
   return userApi
     .post(`/bookshelf/${user_id}/read`, input)
     .then(({ data }) => {
@@ -394,6 +396,38 @@ export const deleteFriend = (friend_id, user_id) => {
   const input = { user_id };
 
   return userApi.post(`/friends/delete/${friend_id}`, input).catch((err) => {
+    throw err;
+  });
+};
+
+export const updateCurrentlyReading = (user_id, isbn) => {
+  const input = { isbn };
+  console.log(input);
+
+  return userApi
+    .post(`/${user_id}/currentlyreading`, input)
+    .then(({ data }) => {
+      console.log(data);
+      return data;
+    })
+    .catch((err) => {
+      throw err;
+    });
+};
+
+export const getCurrentlyReading = (user_id) => {
+  return userApi
+    .get(`/${user_id}/currentlyreading`)
+    .then(({ data }) => {
+      return data;
+    })
+    .catch((err) => {
+      throw err;
+    });
+};
+
+export const resetCurrentlyReading = (user_id) => {
+  return userApi.delete(`/${user_id}/currentlyreading`).catch((err) => {
     throw err;
   });
 };

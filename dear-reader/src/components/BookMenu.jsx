@@ -6,8 +6,11 @@ import {
   deleteFromReadJournal,
   markBookAsRead,
   updateJournal,
+  resetCurrentlyReading,
+  updateCurrentlyReading,
 } from "../api/api";
 import ShareButton from "./ShareButton";
+import BookReadPopup from "./BookReadPopup";
 
 function BookMenu({
   isOnBookshelf,
@@ -20,6 +23,11 @@ function BookMenu({
   rating,
   title,
   isbn,
+  book,
+  currentlyReading,
+  setCurrentlyReading,
+  logPopup,
+  setLogPopup,
 }) {
   const { username, id } = currentUser;
   const [isExiting, setIsExiting] = useState(false);
@@ -33,7 +41,7 @@ function BookMenu({
     if (isRead) {
       deleteFromReadJournal(id, isbn).then((data) => {
         setIsRead(false);
-
+        setCurrentlyReading(false);
         setIsLoading(false);
       });
     }
@@ -62,23 +70,24 @@ function BookMenu({
     }
   };
 
-  const handleSetReview = (e) => {
-    setReview(e.target.value);
-  };
-
-  const handleReview = (e) => {
-    e.preventDefault();
-    const update = { review, isbn };
-    updateJournal(update, id).then((data) => {
-      console.log(data);
-      setMyReview(data.review);
-    });
-  };
-
   const handleRating = (e) => {
     const update = { rating: e.target.value, isbn };
     updateJournal(update, id).then((data) => {
       setRating(data.rating);
+    });
+  };
+
+  const handleCurrentlyReading = (e) => {
+    setIsLoading(true);
+    updateCurrentlyReading(currentUser.id, isbn).then((data) => {
+      setCurrentlyReading(true);
+      handleClose();
+    });
+  };
+
+  const handleResetCurrentlyReading = (e) => {
+    resetCurrentlyReading(currentUser.id).then(() => {
+      setCurrentlyReading(false);
     });
   };
 
@@ -93,6 +102,18 @@ function BookMenu({
 
   return (
     <div>
+      {logPopup && (
+        <BookReadPopup
+          book={book}
+          currentUser={currentUser}
+          setPopup={setLogPopup}
+          setIsRead={setIsRead}
+          isRead={isRead}
+          currentlyReading={currentlyReading}
+          setCurrentlyReading={setCurrentlyReading}
+        />
+      )}
+
       <div
         className={`fixed inset-0 z-10 ${
           backdropExiting
@@ -169,6 +190,7 @@ function BookMenu({
                     />
                   </svg>
                 )}
+
                 <p className="ml-1">Bookshelf</p>
               </button>
               <div>
@@ -178,45 +200,72 @@ function BookMenu({
             </div>
 
             <div className="flex flex-col items-center">
-              <hr className="bg-gray-100 border-0 clear-both w-9/10 h-0.5 mt-2 mb-2" />
+              <ul>
+                <li className="mx-5 text-sm w-80 my-2">
+                  <hr className="border-0 h-px mt-2 bar" />
+                </li>
 
-              <div className="flex flex-col items-center">
-                <h2 className="mb-1">{rating ? "Your Rating" : "Rate"}</h2>
-                <Rating
-                  value={rating ? rating : value}
-                  onChange={(event, newValue) => {
-                    setValue(newValue);
-                  }}
-                  onClick={handleRating}
-                />
-              </div>
-              <hr className="bg-gray-100 border-0 clear-both w-9/10 h-0.5 mt-2 mb-2" />
-              {isRead && review === "" ? (
-                <form
-                  className="mb-1 flex flex-col items-center"
-                  onSubmit={handleReview}
-                >
-                  <div className="py-1 px-2 mb-2 w-80 bg-white rounded-lg rounded-t-lg border border-gray-200">
-                    <textarea
-                      id="review"
-                      rows="3"
-                      className="px-0 w-full text-sm text-gray-900 border-0"
-                      placeholder="Write a review..."
-                      required
-                      onChange={handleSetReview}
-                    ></textarea>
+                <li className="mx-5 text-sm w-80 my-2">
+                  <div className="flex flex-col items-center ">
+                    <h2 className="mb-1">{rating ? "Your Rating" : "Rate"}</h2>
+                    <Rating
+                      value={rating ? rating : value}
+                      onChange={(event, newValue) => {
+                        setValue(newValue);
+                      }}
+                      onClick={handleRating}
+                    />
                   </div>
-                  <button
-                    type="submit"
-                    className="inline-flex items-center py-2.5 px-4 text-xs font-medium text-center text-white button rounded-lg"
-                  >
-                    Post review
-                  </button>
-                </form>
-              ) : (
-                <></>
-              )}
-              <button className="mb-2" onClick={handleClose}>
+                  <hr className="border-0 h-px mt-2 bar" />
+                </li>
+                <li className="mx-5 text-sm w-80">
+                  <div className="flex flex-col items-center mb-2">
+                    <button
+                      onClick={() => {
+                        setLogPopup(true);
+                      }}
+                    >
+                      Review or Log
+                    </button>
+                  </div>
+                  <hr className="border-0 h-px mt-2 bar" />
+                </li>
+                {!isRead && (
+                  <div className="mx-5 text-sm w-80 mt-2">
+                    <div className="flex flex-col items-center mb-2">
+                      {currentlyReading ? (
+                        <div className="mx-5 text-sm w-80">
+                          <li className="flex flex-col items-center">
+                            <button
+                              onClick={() => {
+                                setLogPopup(true);
+                              }}
+                            >
+                              Mark as finished
+                            </button>
+                          </li>
+                          <hr className="border-0 h-px mt-2 bar mb-2" />
+                          <li className="flex flex-col items-center">
+                            <button onClick={handleResetCurrentlyReading}>
+                              Remove from currently reading
+                            </button>
+                          </li>
+                        </div>
+                      ) : (
+                        <li>
+                          <div>
+                            <button onClick={handleCurrentlyReading}>
+                              Set currently reading
+                            </button>
+                          </div>
+                        </li>
+                      )}
+                    </div>
+                    <hr className="border-0 h-px mt-2 bar" />
+                  </div>
+                )}
+              </ul>
+              <button className="mb-3 mt-2 text-gray-300" onClick={handleClose}>
                 Close
               </button>
             </div>

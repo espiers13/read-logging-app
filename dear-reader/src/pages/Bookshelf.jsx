@@ -15,16 +15,16 @@ function Bookshelf({ currentUser }) {
     getBookshelf(username).then((bookshelfData) => {
       const promises = bookshelfData.map((book) => {
         return getBookByIsbn(book.isbn).then(({ items }) => {
-          const book = items[0].volumeInfo;
+          const currentBook = items[0].volumeInfo;
           const newBook = {
             thumbnail:
-              book.imageLinks?.thumbnail ||
+              currentBook.imageLinks?.thumbnail ||
               "https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg?20200913095930",
-            title: book.title,
-            isbn: book.isbn,
-            published: book.publishedData,
-            authors: book.authors,
-            description: "",
+            title: currentBook.title,
+            isbn: currentBook.industryIdentifiers[0].identifier,
+            published: currentBook.publishedDate,
+            authors: currentBook.authors,
+            description: currentBook.description,
           };
           return newBook;
         });

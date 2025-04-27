@@ -18,10 +18,10 @@ function RecentActivity({ book }) {
           navigate(`/book/${isbn}`);
         }}
       >
-        <img src={thumbnail} alt={title} className="h-40" />
+        <img src={thumbnail} alt={title} className="h-32" />
       </button>
 
-      <div className="mt-1 ml-1">
+      <div className="">
         <Rating
           name="read-only"
           value={rating}
@@ -31,7 +31,7 @@ function RecentActivity({ book }) {
           precision={0.5}
         />
       </div>
-      <h4 className="text-xs ml-1.5">{dateRead}</h4>
+      <h4 className="text-xs">{dateRead}</h4>
     </main>
   );
 }

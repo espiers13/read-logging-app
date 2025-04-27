@@ -5,7 +5,15 @@ import { useEffect, useState } from "react";
 
 function FriendActivityCard({ book }) {
   const navigate = useNavigate();
-  const { date_read, isbn, friend_username, rating, review, avatar } = book;
+  const {
+    date_read,
+    isbn,
+    friend_username,
+    rating,
+    review,
+    avatar,
+    friend_id,
+  } = book;
   const [currentBook, setCurrentBook] = useState({});
 
   const date = new Date(date_read);
@@ -33,6 +41,10 @@ function FriendActivityCard({ book }) {
     });
   }, [isbn]);
 
+  const handleUser = (e) => {
+    navigate(`/user/${friend_username}/${friend_id}`);
+  };
+
   const { title, authors, published, thumbnail } = currentBook;
 
   let datePublished = published;
@@ -50,19 +62,29 @@ function FriendActivityCard({ book }) {
           <img src={thumbnail} alt={title} className="w-24" />
         </button>
         <div className="flex-1 min-w-0">
-          <p className="mb-0.5">{title}</p>
+          <div className="flex items-center gap-1">
+            <button onClick={handleUser}>
+              <img
+                className="w-7 h-7 rounded-full mr-1"
+                src={avatar}
+                alt={friend_username}
+              />
+            </button>
+
+            <p className="text-sm">
+              <button onClick={handleUser} className="underline">
+                {friend_username}
+              </button>{" "}
+              finished reading:
+            </p>
+          </div>
+          <p className="mb-0.5 mt-1">{title}</p>
           <p className="text-sm text-gray-500">
             by {authors} {datePublished}
           </p>
 
           <div className="flex items-center gap-1">
-            <img
-              className="w-7 h-7 rounded-full"
-              src={avatar}
-              alt={friend_username}
-            />
-            <div className="text-xs">
-              <p>{friend_username}</p>
+            <div className="mt-2">
               {rating && (
                 <Rating
                   name="read-only"

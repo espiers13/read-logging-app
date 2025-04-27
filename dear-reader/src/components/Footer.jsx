@@ -5,7 +5,7 @@ import { useState } from "react";
 function Footer({ currentUser }) {
   const { pathname } = useLocation();
   const navigate = useNavigate();
-  const [popup, setPopup] = useState(true);
+  const [popup, setPopup] = useState(false);
 
   const handleAdd = (e) => {
     setPopup(!popup);

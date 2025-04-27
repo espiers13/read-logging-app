@@ -171,6 +171,15 @@ main {
   color: #25344f;
 }
 
+.review {
+  color: #25344f;
+}
+
+.review:focus {
+  background-color: #a1afbf;
+  color: #25344f;
+}
+
 .signupbutton {
   background-color: #42517d;
   color: #f6f6f6;
@@ -231,6 +240,7 @@ main {
   position: relative;
   margin-left: 10px;
   margin-right: 10px;
+  width: 100%;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 }
 
@@ -269,5 +279,12 @@ main {
 .modal-scroll-area {
   overflow-y: auto;
   margin-top: 1rem;
-  flex: 1; /* fills the remaining space */
+  flex: 1;
+}
+
+.multi-line-clamp {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }

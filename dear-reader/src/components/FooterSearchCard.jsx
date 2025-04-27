@@ -11,7 +11,7 @@ import {
 function FooterSearchCard({ book, currentUser }) {
   const { id, username } = currentUser;
   const currentBook = book.volumeInfo;
-  const isbn = currentBook.industryIdentifiers[0].identifier;
+  const isbn = currentBook?.industryIdentifiers?.[0]?.identifier || null;
   const { title, publishedDate } = currentBook;
   const [isRead, setIsRead] = useState(false);
   const [isOnBookshelf, setIsOnBookshelf] = useState(false);
@@ -21,7 +21,9 @@ function FooterSearchCard({ book, currentUser }) {
   const [authors, setAuthors] = useState([]);
 
   useEffect(() => {
-    setAuthors(currentBook.authors);
+    if (currentBook.authors) {
+      setAuthors(currentBook.authors);
+    } else setAuthors(["Unknown"]);
   }, [book]);
 
   useEffect(() => {

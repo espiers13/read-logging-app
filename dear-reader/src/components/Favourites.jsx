@@ -11,7 +11,7 @@ function Favourites({ favourite }) {
           navigate(`/book/${isbn}`);
         }}
       >
-        <img src={thumbnail} alt={title} className="h-40" />
+        <img src={thumbnail} alt={title} className="h-32" />
       </button>
     </main>
   );

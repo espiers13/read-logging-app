@@ -1,5 +1,5 @@
 import ProfileTabs from "../components/ProfileTabs";
-import { getReadJournal, fetchBookByISBN, getBookByIsbn } from "../api/api";
+import { getReadJournal, getBookByIsbn } from "../api/api";
 import { useState, useEffect } from "react";
 import Loading from "../components/Loading";
 import JournalCard from "../components/JournalCard";
@@ -8,6 +8,7 @@ function Journal({ currentUser }) {
   const [journal, setJournal] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [dates, setDates] = useState([]);
+  const [journalUpdated, setJournalUpdated] = useState(false);
 
   useEffect(() => {
     setJournal([]);
@@ -45,7 +46,7 @@ function Journal({ currentUser }) {
         setIsLoading(false);
       });
     });
-  }, [currentUser.id]);
+  }, [currentUser.id, journalUpdated]);
 
   const groupedBooks = journal
     .sort((a, b) => new Date(b.date_read) - new Date(a.date_read))
@@ -85,7 +86,11 @@ function Journal({ currentUser }) {
                     bookIndex === groupedBooks[monthYear].length - 1;
                   return (
                     <li key={book.id || `${book.isbn}-${bookIndex}`}>
-                      <JournalCard book={book} currentUser={currentUser} />
+                      <JournalCard
+                        book={book}
+                        currentUser={currentUser}
+                        setJournalUpdated={setJournalUpdated}
+                      />
                       {!isLastBook && (
                         <hr className="bar border-0 clear-both w-full h-0.5 mt-2 mb-2" />
                       )}

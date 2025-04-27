@@ -8,6 +8,7 @@ import {
   sendFriendRequest,
   getFriendRequestsByUserId,
   deleteFriend,
+  getCurrentlyReading,
 } from "../api/api";
 import { useEffect, useState } from "react";
 import Loading from "../components/Loading";
@@ -27,6 +28,7 @@ function FriendProfile({ currentUser }) {
   const [isPending, setIsPending] = useState(false);
   const [requestSent, setRequestSent] = useState("");
   const [buttonLoading, setButtonLoading] = useState(false);
+  const [currentlyReading, setCurrentlyReading] = useState(null);
 
   useEffect(() => {
     setIsLoading(true);
@@ -90,6 +92,24 @@ function FriendProfile({ currentUser }) {
   }, [friend_id]);
 
   useEffect(() => {
+    getCurrentlyReading(friend_id).then((bookData) => {
+      if (bookData) {
+        getBookByIsbn(bookData.isbn).then(({ items }) => {
+          const currentBook = items[0].volumeInfo;
+          const newBook = {
+            thumbnail:
+              currentBook.imageLinks?.thumbnail ||
+              "https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg?20200913095930",
+            title: currentBook.title,
+            isbn: currentBook.industryIdentifiers[0].identifier,
+          };
+          setCurrentlyReading(newBook);
+        });
+      }
+    });
+  }, [currentUser.id]);
+
+  useEffect(() => {
     getFriendRequestsByUserId(friend_id).then((data) => {
       setIsPending(
         data.some(
@@ -126,6 +146,16 @@ function FriendProfile({ currentUser }) {
         <img src={userData.avatar} className="w-24 h-24 rounded-full" />
         {userData.pronouns && <p className="text-sm">{userData.pronouns}</p>}
         <hr className="bar border-0 clear-both w-full h-0.5 mt-5 mb-2" />
+
+        {currentlyReading && (
+          <div className="w-full">
+            <div className="flex items-center justify-center flex-col">
+              <h1 className="text-center">CURRENTLY READING</h1>
+              <Favourites favourite={currentlyReading} />
+            </div>
+            <hr className="bar border-0 clear-both w-full h-0.5 mt-5 mb-2" />
+          </div>
+        )}
 
         {favourites.length > 0 ? (
           <div>

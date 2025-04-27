@@ -65,7 +65,7 @@ function Journal({ currentUser }) {
     }, {});
 
   return (
-    <main className="mb-10">
+    <main className="w-full mb-10">
       <div className="mb-4">
         <ProfileTabs page="journal" currentUser={currentUser} />
       </div>

@@ -55,7 +55,7 @@ function SearchResults() {
   });
 
   return (
-    <main>
+    <main className="w-full mb-10">
       <div className="flex items-center space-x-2">
         <button onClick={handleGoBack}>
           <svg

@@ -141,7 +141,7 @@ function FriendProfile({ currentUser }) {
   }
 
   return (
-    <main>
+    <main className="w-full mb-10">
       <div className="flex items-center justify-center flex-col mt-1">
         <img src={userData.avatar} className="w-24 h-24 rounded-full" />
         {userData.pronouns && <p className="text-sm">{userData.pronouns}</p>}

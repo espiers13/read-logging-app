@@ -118,7 +118,7 @@ function BookInfo({ currentUser }) {
   }
 
   return (
-    <main className="mb-5">
+    <main className="w-full mb-10">
       {logPopup && (
         <BookReadPopup
           book={currentBook}

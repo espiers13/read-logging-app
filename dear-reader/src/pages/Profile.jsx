@@ -90,7 +90,7 @@ function Profile({ currentUser }) {
   const { avatar } = currentUser;
 
   return (
-    <main className="w-full">
+    <main className="w-full mb-10">
       <ProfileTabs page="profile" currentUser={currentUser} />
 
       <div className="flex items-center justify-center flex-col mt-1 w-full">

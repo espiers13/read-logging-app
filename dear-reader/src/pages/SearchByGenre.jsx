@@ -29,7 +29,7 @@ function SearchByGenre() {
   }
 
   return (
-    <main>
+    <main className="w-full mb-10">
       {isLoading ? (
         <Loading />
       ) : (

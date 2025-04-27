@@ -18,7 +18,7 @@ function Search() {
   };
 
   return (
-    <main className="mb-10">
+    <main className="w-full mb-10">
       <SearchBar onChange={handleSearchQuery} value={searchQuery} />
       <p className="mt-3 ml-4 font-roboto tracking-widest">Browse by</p>
       <div className="ml-4 mr-4 font-roboto tracking-wide text-sm">

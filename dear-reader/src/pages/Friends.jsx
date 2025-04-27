@@ -28,7 +28,7 @@ function Friends({ currentUser }) {
   }, [currentUser]);
 
   return (
-    <main>
+    <main className="w-full mb-10">
       <ProfileTabs page="friends" currentUser={currentUser} />
       {isLoading ? (
         <Loading />

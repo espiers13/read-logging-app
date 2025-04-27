@@ -109,7 +109,7 @@ function Homepage({ currentUser }) {
   }
 
   return (
-    <main>
+    <main className="w-full mb-10">
       {!bookQuote ? (
         <></>
       ) : (

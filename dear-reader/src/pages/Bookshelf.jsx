@@ -37,7 +37,7 @@ function Bookshelf({ currentUser }) {
   }, [currentUser.id]);
 
   return (
-    <main>
+    <main className="w-full mb-10">
       <ProfileTabs page="bookshelf" currentUser={currentUser} />
       {isLoading ? (
         <Loading />

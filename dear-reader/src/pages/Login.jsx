@@ -2,6 +2,7 @@ import { useState } from "react";
 import { loginUser } from "../api/api";
 import { useNavigate } from "react-router-dom";
 import LoadingButton from "../components/LoadingButton";
+import Logo from "../components/Logo";
 
 function Login({ setCurrentUser }) {
   const [username, setUsername] = useState("");
@@ -38,7 +39,7 @@ function Login({ setCurrentUser }) {
     <main>
       <div className="flex min-h-full flex-col justify-center px-6 py-12 h-screen">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm text-center">
-          <img src="../../public/images/logo.png" className="h-24 mx-auto" />
+          <Logo />
           <h2 className="text-center text-5xl tracking-tight font-serif">
             Login
           </h2>

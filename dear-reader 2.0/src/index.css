@@ -1,0 +1,290 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto&display=swap");
+@import "tailwindcss/preflight";
+@import "animate.css";
+@tailwind utilities;
+
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #25344f;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  --font-roboto: "Roboto", sans-serif;
+}
+
+.card {
+  background-color: #f6f6f6;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.content {
+  flex: 1;
+  padding: 20px;
+}
+
+.footer {
+  background: #617891;
+  color: #f6f6f6;
+  text-align: center;
+  padding: 10px;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+}
+
+.header {
+  color: #f6f6f6;
+  text-align: center;
+  padding: 10px;
+}
+
+h3 {
+  color: #25344f;
+}
+
+h4 {
+  color: #617891;
+}
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+main {
+  flex-grow: 1;
+  padding: 10px;
+  overflow-x: hidden;
+}
+
+@media (max-width: 768px) {
+  main {
+    padding: 15px;
+  }
+  footer {
+    padding: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  main {
+    padding: 8px;
+  }
+  footer {
+    padding: 8px;
+  }
+}
+
+.banner {
+  background-color: #1c2540;
+}
+
+.description-text {
+  display: -webkit-box;
+  -webkit-line-clamp: 6; /* Change this number to however many lines you want */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.search-container {
+  position: relative;
+}
+
+.search-input {
+  height: 40px;
+  width: 100%;
+  border-radius: 30px;
+  padding-left: 35px;
+  border: none;
+  background-color: #617891;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.rotate-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  cursor: pointer;
+}
+
+.icon {
+  transition: transform 0.3s ease;
+}
+
+.icon.rotated {
+  transform: rotate(90deg);
+}
+
+.search-icon {
+  position: absolute;
+  top: 50%;
+  left: 15px;
+  transform: translateY(-50%);
+  color: #f6f6f6;
+}
+
+.button {
+  background-color: #42517d;
+  color: #f6f6f6;
+}
+
+.profile-tabs {
+  background-color: #42517d;
+  color: #b3b3b3;
+}
+
+.active-button {
+  background-color: #b3b3b3;
+  color: #42517d;
+}
+
+.book-menu {
+  background-color: #617891;
+}
+
+.book-menu-top-shadow {
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.quote {
+  background-color: #42517d;
+  color: #b3b3b3;
+}
+
+.input {
+  background-color: #a1afbf;
+  color: #25344f;
+}
+
+.review {
+  color: #25344f;
+}
+
+.review:focus {
+  background-color: #a1afbf;
+  color: #25344f;
+}
+
+.signupbutton {
+  background-color: #42517d;
+  color: #f6f6f6;
+}
+
+.bar {
+  background-color: #42517d;
+  color: #b3b3b3;
+}
+
+.input-settings {
+  background-color: #506378;
+  color: #f6f6f6;
+}
+
+.popup-container {
+  position: fixed;
+  bottom: -100%;
+  left: 0;
+  width: 100%;
+  background: #ffffff;
+  transition: bottom 0.3s ease-in-out;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+.popup-container.show {
+  bottom: 0;
+}
+
+.popup-content {
+  padding: 20px;
+  border-top: 1px solid #ddd;
+}
+
+.list-book {
+  background-color: #a1a1a1;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: #b3b3b3;
+  color: #1c2540;
+  padding: 1.5rem;
+  border-radius: 8px;
+  position: relative;
+  margin-left: 10px;
+  margin-right: 10px;
+  width: 100%;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.modal-close {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.footer-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  z-index: 999;
+}
+
+.footer-modal-content {
+  background-color: #b3b3b3;
+  color: #1c2540;
+  padding: 20px;
+  width: 100%;
+  height: 70%;
+  border-radius: 12px 12px 0 0;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-scroll-area {
+  overflow-y: auto;
+  margin-top: 1rem;
+  flex: 1;
+}
+
+.multi-line-clamp {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

@@ -26,7 +26,7 @@ const openLibrarySearch = axios.create({
 
 const nytKey = "TeQkGTyrIZAealqg2ZdcNa7V9x01IZVj";
 
-const googleBooksKey = "AIzaSyAaehyiaB7KOgp3o2OI_u5WB9XZ7iJhUDo";
+const googleBooksKey = "AIzaSyDb09cdSNN4oQhj1Q1v5U9zsa4aQ7wzOuY";
 
 export const getBestSellers = async (retries = 5, delay = 1000) => {
   const url = `/lists/current/hardcover-fiction.json?api-key=${nytKey}`;

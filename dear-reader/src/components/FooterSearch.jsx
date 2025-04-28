@@ -2,11 +2,14 @@ import { useState, useEffect } from "react";
 import { searchBooks } from "../api/api";
 import FooterSearchCard from "./FooterSearchCard";
 
-function FooterSearch({ setResults }) {
+function FooterSearch({ setResults, setSearch }) {
   const [query, setQuery] = useState("");
   const [params, setParams] = useState("title:");
 
   const handleQuery = (e) => {
+    if (e.target.value === "") {
+      setSearch("");
+    }
     setQuery(e.target.value);
   };
 
@@ -18,9 +21,11 @@ function FooterSearch({ setResults }) {
 
     const delayDebounce = setTimeout(() => {
       searchBooks(query, params).then(({ items }) => {
-        setResults(items);
+        if (!items) {
+          setSearch("No books found");
+        } else setResults(items);
       });
-    }, 300);
+    }, 800);
 
     return () => clearTimeout(delayDebounce);
   }, [query, params]);

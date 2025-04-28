@@ -2,6 +2,7 @@ import { getFriendsByUserId, getReadJournal } from "../api/api";
 import { useState, useEffect } from "react";
 import FriendActivityCard from "../components/FriendActivityCard";
 import ProfileSearch from "../components/ProfileSearch";
+import SearchBar from "../components/SearchBar";
 
 function FriendActivity({ currentUser }) {
   const [isLoading, setIsLoading] = useState(false);
@@ -54,8 +55,17 @@ function FriendActivity({ currentUser }) {
 
   return (
     <main className="w-full mb-10">
+      {friends.length > 0 && friendsActivity.length === 0 && (
+        <div className="text-sm text-center">
+          <p>Your friends haven't logged any books yet!</p>
+          <p className="mb-4">
+            Search for some books to send them reccomendations:
+          </p>
+          <SearchBar />
+        </div>
+      )}
       <div>
-        {friends.length > 1 ? (
+        {friends.length > 0 ? (
           <ul>
             {Object.keys(groupedBooks).map((monthYear) => (
               <li key={monthYear}>

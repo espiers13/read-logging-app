@@ -20,6 +20,7 @@ import FriendProfile from "./pages/FriendProfile";
 import MobileOnlyGate from "./components/MobileOnlyGate";
 import BookNotFound from "./pages/BookNotFound";
 import FriendActivity from "./pages/FriendActivity";
+import Stats from "./pages/Stats";
 
 function App() {
   const [currentUser, setCurrentUser] = useState(() => {
@@ -99,6 +100,10 @@ function App() {
             <Route
               path="/:user_id/profile"
               element={<Profile currentUser={currentUser} />}
+            />
+            <Route
+              path="/:user_id/stats"
+              element={<Stats currentUser={currentUser} />}
             />
             <Route path="/search/:search_query" element={<SearchResults />} />
             <Route path="/search/genre/:genre" element={<SearchByGenre />} />

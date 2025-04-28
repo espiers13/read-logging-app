@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 function ProfileTabs({ page, currentUser }) {
   const navigate = useNavigate();
@@ -32,6 +31,17 @@ function ProfileTabs({ page, currentUser }) {
           }}
         >
           Journal
+        </button>
+        <button
+          type="button"
+          className={`flex-1 px-2 py-2 text-sm font-medium text-gray-900 border-t border-b border-l ${
+            page === "stats" ? "active-button" : "profile-tabs"
+          }`}
+          onClick={() => {
+            navigate(`/${id}/stats`);
+          }}
+        >
+          Statistics
         </button>
         <button
           type="button"

@@ -1,10 +1,10 @@
 import ProfileTabs from "../components/ProfileTabs";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   getReadJournal,
   getBookByIsbn,
-  fetchBookByISBN,
   getCurrentlyReading,
+  fetchBookByISBN,
 } from "../api/api";
 import RecentActivity from "../components/RecentActivity";
 import Loading from "../components/Loading";
@@ -17,74 +17,91 @@ function Profile({ currentUser }) {
   const [isLoading, setIsLoading] = useState(false);
   const [currentlyReading, setCurrentlyReading] = useState(null);
 
-  useEffect(() => {
-    setRecentActivity([]);
-    setIsLoading(true);
-    getReadJournal(currentUser.username).then((journalData) => {
-      const sortedData = journalData.sort(
-        (a, b) => new Date(b.date_read) - new Date(a.date_read)
-      );
-      const recentBooks = sortedData.slice(0, 3);
-      const promises = recentBooks.map((book) => {
-        return getBookByIsbn(book.isbn).then(({ items }) => {
-          const currentBook = items[0].volumeInfo;
-          const newBook = {
-            thumbnail:
-              currentBook.imageLinks?.thumbnail ||
-              "https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg?20200913095930",
-            title: currentBook.title,
-            rating: book.rating,
-            date_read: book.date_read,
-            isbn: currentBook.industryIdentifiers[0].identifier,
-          };
-          return newBook;
-        });
+  const bookCache = useRef(new Map());
+
+  const fetchBook = (isbn) => {
+    if (bookCache.current.has(isbn)) {
+      return Promise.resolve(bookCache.current.get(isbn));
+    }
+
+    return getBookByIsbn(isbn)
+      .then(({ items }) => {
+        const currentBook = items[0].volumeInfo;
+        const bookData = {
+          thumbnail:
+            currentBook.imageLinks?.thumbnail ||
+            "https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg?20200913095930",
+          title: currentBook.title,
+          isbn: currentBook.industryIdentifiers[0].identifier,
+        };
+        bookCache.current.set(isbn, bookData);
+        return bookData;
+      })
+      .catch((error) => {
+        console.error("Error fetching book:", isbn, error);
+        return null;
       });
-      Promise.all(promises).then((newBooks) => {
-        setRecentActivity((prevActivity) => [...prevActivity, ...newBooks]);
-      });
-    });
-  }, [currentUser.id]);
+  };
 
   useEffect(() => {
-    getCurrentlyReading(currentUser.id).then((bookData) => {
-      if (bookData) {
-        getBookByIsbn(bookData.isbn).then(({ items }) => {
-          const currentBook = items[0].volumeInfo;
-          const newBook = {
-            thumbnail:
-              currentBook.imageLinks?.thumbnail ||
-              "https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg?20200913095930",
-            title: currentBook.title,
-            isbn: currentBook.industryIdentifiers[0].identifier,
-          };
-          setCurrentlyReading(newBook);
+    const loadRecentActivity = () => {
+      setRecentActivity([]);
+      setIsLoading(true);
+      getReadJournal(currentUser.username)
+        .then((journalData) => {
+          const sortedData = journalData.sort(
+            (a, b) => new Date(b.date_read) - new Date(a.date_read)
+          );
+          const recentBooks = sortedData.slice(0, 3);
+          return Promise.all(
+            recentBooks.map((book) => {
+              return fetchBook(book.isbn).then((bookInfo) => {
+                if (bookInfo) {
+                  return {
+                    ...bookInfo,
+                    rating: book.rating,
+                    date_read: book.date_read,
+                  };
+                }
+                return null;
+              });
+            })
+          );
+        })
+        .then((books) => {
+          setRecentActivity(books.filter(Boolean));
         });
-      }
-    });
-  }, [currentUser.id]);
+    };
 
-  useEffect(() => {
-    setFavourites([]);
-    getFavourites(currentUser.id).then((favouritesData) => {
-      const promises = favouritesData.map((favourite) => {
-        return getBookByIsbn(favourite.isbn).then(({ items }) => {
-          const currentBook = items[0].volumeInfo;
-          const newBook = {
-            thumbnail:
-              currentBook.imageLinks?.thumbnail ||
-              "https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg?20200913095930",
-            title: currentBook.title,
-            isbn: currentBook.industryIdentifiers[0].identifier,
-          };
-          return newBook;
+    const loadCurrentlyReading = () => {
+      getCurrentlyReading(currentUser.id).then((bookData) => {
+        if (bookData) {
+          return fetchBook(bookData.isbn).then((bookInfo) => {
+            setCurrentlyReading(bookInfo);
+          });
+        }
+      });
+    };
+
+    const loadFavourites = () => {
+      setFavourites([]);
+      getFavourites(currentUser.id)
+        .then((favouritesData) => {
+          return Promise.all(
+            favouritesData.map((fav) => {
+              return fetchBook(fav.isbn);
+            })
+          );
+        })
+        .then((books) => {
+          setFavourites(books.filter(Boolean));
+          setIsLoading(false);
         });
-      });
-      Promise.all(promises).then((newBooks) => {
-        setFavourites((prevFavourites) => [...prevFavourites, ...newBooks]);
-        setIsLoading(false);
-      });
-    });
+    };
+
+    loadRecentActivity();
+    loadCurrentlyReading();
+    loadFavourites();
   }, [currentUser.id]);
 
   const { avatar } = currentUser;

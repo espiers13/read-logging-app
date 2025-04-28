@@ -45,24 +45,6 @@ function Search() {
 
         {genresOpen ? <GenreSearch /> : <></>}
         <hr className="bg-gray-400 border-0 clear-both w-full h-0.5 mt-2 mb-2" />
-        <button
-          className="flex justify-between items-center space-x-4 bg-transparent w-full"
-          onClick={handleRated}
-        >
-          <p>Highest Rated</p>
-          <svg
-            className="h-6 w-6 text-slate-200"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <polyline points="9 18 15 12 9 6" />
-          </svg>
-        </button>
-        <hr className="bg-gray-400 border-0 clear-both w-full h-0.5 mt-2 mb-2" />
       </div>
     </main>
   );
